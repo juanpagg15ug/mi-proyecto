@@ -5,6 +5,7 @@ import { renderCaseDetailView } from './views/caseDetailView.js';
 import { renderEventEntry, renderEventView } from './views/eventView.js';
 
 let navigationToken = 0;
+let eventSessionActive = false;
 
 function startView() {
     const container = document.getElementById('app-container');
@@ -72,8 +73,52 @@ function renderEventEntryView() {
     focusApp();
 }
 
+function confirmEventExit() {
+    if (!eventSessionActive) return Promise.resolve(true);
+
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.id = 'event-exit-modal';
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'event-exit-title');
+        modal.innerHTML = `
+            <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+                <h2 id="event-exit-title" class="text-xl font-bold text-indigo-900">¿Salir del evento?</h2>
+                <p class="mt-2 text-sm leading-6 text-gray-600">Perderás el contexto actual de la estación y, si hay un cronómetro activo, su tiempo. Podrás volver a entrar con el código del evento.</p>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button id="cancel-event-exit" type="button" class="rounded-lg border border-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50">Continuar en el evento</button>
+                    <button id="confirm-event-exit" type="button" class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700">Salir del evento</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const close = (shouldExit) => {
+            modal.remove();
+            resolve(shouldExit);
+        };
+        modal.querySelector('#cancel-event-exit').addEventListener('click', () => close(false));
+        modal.querySelector('#confirm-event-exit').addEventListener('click', () => close(true));
+        modal.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') close(false);
+        });
+        modal.querySelector('#cancel-event-exit').focus();
+    });
+}
+
+async function exitEvent() {
+    if (!await confirmEventExit()) return;
+    eventSessionActive = false;
+    renderHeader(1);
+    renderModuleSelector();
+    focusApp();
+}
+
 function renderEvent(access) {
     const eventCode = access.eventCode;
+    eventSessionActive = true;
     const eventToken = startView();
     renderHeader(3, { eventoId: eventCode, accessMode: access.accessMode });
     renderEventView('app-container', eventCode, access, (casoId, role, code, stationId, stationName, accessMode, timerMinutes) => {
@@ -98,6 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHeader(1);
     renderModuleSelector();
 
+    window.addEventListener('beforeunload', (event) => {
+        if (!eventSessionActive) return;
+        event.preventDefault();
+        event.returnValue = '';
+    });
+
     document.body.addEventListener('click', (e) => {
         const target = e.target.closest('[id], [data-caso-id]');
         if (!target) return;
@@ -111,6 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (target.id === 'btn-open-event') {
             renderEventEntryView();
         } else if (target.id === 'btn-home' || target.id === 'btn-back-home') {
+            if (target.id === 'btn-home' && eventSessionActive) {
+                exitEvent();
+                return;
+            }
             renderHeader(1);
             renderModuleSelector();
             focusApp();
@@ -121,8 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderEventEntryView();
         } else if (target.id === 'btn-salir-evento') {
             e.preventDefault();
-            renderHeader(1);
-            renderModuleSelector();
+            exitEvent();
         }
     });
 });

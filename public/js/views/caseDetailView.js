@@ -1,4 +1,5 @@
 import { db } from '../firebase-config.js';
+import { offlineNotice, readOffline, saveOffline } from '../offlineCache.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const tabs = [
@@ -50,6 +51,12 @@ function sectionIdsForRole(role, isEvent) {
     return ['lectura', 'escenario', 'debriefing'];
 }
 
+function hasOperationalContent(content) {
+    return Object.values(content).some((section) => Object.entries(section).some(([key, value]) => {
+        return !['fuente_google_doc_id', 'fuente_google_doc_url', 'version', 'actualizado_en'].includes(key) && Boolean(value);
+    }));
+}
+
 export async function renderCaseDetailView(containerId, casoId, options = {}) {
     const container = document.getElementById(containerId);
     if (!container || !casoId) return;
@@ -64,18 +71,26 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
     try {
         const isEvent = options.context === 'event';
         const sectionIds = sectionIdsForRole(options.role, isEvent);
-        const casoSnapshot = await getDoc(doc(db, 'casos', casoId));
-        if (options.token && container.dataset.viewToken !== options.token) return;
-
-        if (!casoSnapshot.exists()) {
-            container.innerHTML = `<div class="bg-red-50 text-red-700 p-6 rounded-lg">El caso solicitado no existe.</div>`;
-            return;
+        let caso;
+        let offlineMode = false;
+        try {
+            const casoSnapshot = await getDoc(doc(db, 'casos', casoId));
+            if (!casoSnapshot.exists()) {
+                container.innerHTML = `<div class="bg-red-50 text-red-700 p-6 rounded-lg">El caso solicitado no existe.</div>`;
+                return;
+            }
+            caso = casoSnapshot.data();
+            saveOffline('case-meta', casoId, caso);
+        } catch (error) {
+            caso = readOffline('case-meta', casoId);
+            if (!caso) throw error;
+            offlineMode = true;
         }
-
-        const caso = casoSnapshot.data();
+        if (options.token && container.dataset.viewToken !== options.token) return;
         if (!isEvent) {
             container.innerHTML = `
                 <section class="max-w-4xl mx-auto py-6">
+                    ${offlineMode ? offlineNotice() : ''}
                     <button id="btn-back-catalog" class="text-sm font-semibold text-indigo-700 hover:text-indigo-900 mb-6" type="button">
                         <i class="fas fa-arrow-left mr-2"></i>Volver al catálogo
                     </button>
@@ -95,16 +110,40 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
             return;
         }
 
-        const sectionSnapshots = await Promise.all(sectionIds.map((sectionId) => getDoc(doc(db, 'casos_contenido', casoId, 'secciones', sectionId))));
+        let content;
+        try {
+            const sectionSnapshots = await Promise.all(sectionIds.map((sectionId) => getDoc(doc(db, 'casos_contenido', casoId, 'secciones', sectionId))));
+            content = Object.fromEntries(sectionIds.map((sectionId, index) => [sectionId, sectionSnapshots[index].exists() ? sectionSnapshots[index].data() : {}]));
+            saveOffline('case-content', `${casoId}:${options.role || 'public'}`, content);
+        } catch (error) {
+            content = readOffline('case-content', `${casoId}:${options.role || 'public'}`);
+            if (!content) throw error;
+            offlineMode = true;
+        }
         if (options.token && container.dataset.viewToken !== options.token) return;
-
-        const content = Object.fromEntries(sectionIds.map((sectionId, index) => [sectionId, sectionSnapshots[index].exists() ? sectionSnapshots[index].data() : {}]));
+        if (!hasOperationalContent(content)) {
+            container.innerHTML = `
+                <section class="max-w-4xl mx-auto py-6">
+                    ${offlineMode ? offlineNotice() : ''}
+                    <button id="btn-back-catalog" class="text-sm font-semibold text-indigo-700 hover:text-indigo-900 mb-6" type="button">
+                        <i class="fas fa-arrow-left mr-2"></i>${options.backLabel || 'Volver al catálogo'}
+                    </button>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-900">
+                        <h1 class="text-xl font-bold">Caso sin contenido operativo</h1>
+                        <p class="mt-2">Este caso no tiene contenido operativo disponible para este rol.</p>
+                    </div>
+                </section>
+            `;
+            container.querySelector('#btn-back-catalog').addEventListener('click', () => options.onBack?.());
+            return;
+        }
         const visibleTabs = tabsForRole(options.role, isEvent);
         const activeTab = visibleTabs[0].id;
         const backLabel = options.backLabel || 'Volver al catálogo';
 
         container.innerHTML = `
             <section class="max-w-4xl mx-auto py-6">
+                ${offlineMode ? offlineNotice() : ''}
                 <button id="btn-back-catalog" class="text-sm font-semibold text-indigo-700 hover:text-indigo-900 mb-6" type="button">
                     <i class="fas fa-arrow-left mr-2"></i>${backLabel}
                 </button>
@@ -118,6 +157,7 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
                     <p class="text-gray-600 mt-2">${caso.resumen_publico || 'Sin resumen público disponible.'}</p>
                     ${options.role ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-800 text-sm font-semibold"><i class="fas fa-user-tag"></i> Vista activa: ${options.role}</div>` : ''}
                     ${options.role === 'estudiante' && options.timerMinutes ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 text-amber-800 text-sm font-semibold"><i class="fas fa-clock"></i> Tiempo restante: <span id="student-timer">${formatTime(options.timerMinutes * 60)}</span></div>` : ''}
+                    ${isEvent ? '<button id="btn-print-station" class="no-print mt-4 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50" type="button"><i class="fas fa-print mr-2"></i>Guardar respaldo PDF</button>' : ''}
                 </div>
                 <div class="border-b border-gray-200 mb-6 flex gap-6" role="tablist" aria-label="Contenido del caso">
                     ${visibleTabs.map((tab, index) => `<button type="button" class="case-tab py-3 text-sm font-semibold ${index === 0 ? 'text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-500'}" data-tab="${tab.id}" role="tab" aria-selected="${index === 0}">${tab.label}</button>`).join('')}
@@ -144,6 +184,7 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
         container.querySelector('#btn-back-catalog').addEventListener('click', () => {
             if (options.onBack) options.onBack();
         });
+        container.querySelector('#btn-print-station')?.addEventListener('click', () => window.print());
 
         if (options.role === 'estudiante' && options.timerMinutes) {
             let secondsLeft = Math.max(0, Math.round(options.timerMinutes * 60));

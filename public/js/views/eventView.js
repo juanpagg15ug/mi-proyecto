@@ -1,4 +1,5 @@
 import { db } from '../firebase-config.js';
+import { offlineNotice, readOffline, saveOffline } from '../offlineCache.js';
 import { collection, doc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 function normalizeCode(value) {
@@ -80,18 +81,38 @@ export async function renderEventView(containerId, eventCode, access = {}, onOpe
     try {
         const requestedEventCode = String(eventCode).trim();
         let resolvedEventCode = requestedEventCode;
-        let eventSnapshot = await getDoc(doc(db, 'eventos', requestedEventCode));
-        if (!eventSnapshot.exists() && requestedEventCode !== normalizeCode(requestedEventCode)) {
+        let offlineMode = false;
+        let event;
+        let stations;
+        try {
+            let eventSnapshot = await getDoc(doc(db, 'eventos', requestedEventCode));
+            if (!eventSnapshot.exists() && requestedEventCode !== normalizeCode(requestedEventCode)) {
+                resolvedEventCode = normalizeCode(requestedEventCode);
+                eventSnapshot = await getDoc(doc(db, 'eventos', resolvedEventCode));
+            }
+            if (!eventSnapshot.exists()) {
+                container.innerHTML = `<div class="bg-red-50 text-red-700 p-6 rounded-lg">No existe un evento con ese código.</div>`;
+                return;
+            }
+            event = eventSnapshot.data();
+            const stationSnapshot = await getDocs(collection(db, 'eventos', resolvedEventCode, 'estaciones'));
+            stations = stationSnapshot.docs
+                .map((station) => {
+                    const data = station.data();
+                    return { id: station.id, ...data, casoId: getCaseId(data) };
+                })
+                .sort((left, right) => (left.orden || 0) - (right.orden || 0));
+            saveOffline('event', resolvedEventCode, { event, stations });
+        } catch (error) {
+            const cached = readOffline('event', normalizeCode(requestedEventCode));
+            if (!cached) throw error;
             resolvedEventCode = normalizeCode(requestedEventCode);
-            eventSnapshot = await getDoc(doc(db, 'eventos', resolvedEventCode));
+            event = cached.event;
+            stations = cached.stations || [];
+            offlineMode = true;
         }
         if (options.token && container.dataset.viewToken !== options.token) return;
-        if (!eventSnapshot.exists()) {
-            container.innerHTML = `<div class="bg-red-50 text-red-700 p-6 rounded-lg">No existe un evento con ese código.</div>`;
-            return;
-        }
 
-        const event = eventSnapshot.data();
         const accessMode = access.accessMode || 'participant';
         const isStaff = accessMode === 'staff';
         const staffCode = event.codigo_staff || '';
@@ -103,17 +124,9 @@ export async function renderEventView(containerId, eventCode, access = {}, onOpe
             container.innerHTML = `<div class="bg-red-50 text-red-700 p-6 rounded-lg">El código privado del staff no coincide con este evento.</div>`;
             return;
         }
-        const stationSnapshot = await getDocs(collection(db, 'eventos', resolvedEventCode, 'estaciones'));
-        if (options.token && container.dataset.viewToken !== options.token) return;
-        const stations = stationSnapshot.docs
-            .map((station) => {
-                const data = station.data();
-                return { id: station.id, ...data, casoId: getCaseId(data) };
-            })
-            .sort((left, right) => (left.orden || 0) - (right.orden || 0));
-
         container.innerHTML = `
             <section class="max-w-3xl mx-auto py-8">
+                ${offlineMode ? offlineNotice() : ''}
                 <div class="mb-8">
                     <span class="text-xs font-bold uppercase tracking-wide text-indigo-600">Evento</span>
                     <h1 class="text-3xl font-bold text-indigo-900 mt-1">${event.nombre || eventCode}</h1>
