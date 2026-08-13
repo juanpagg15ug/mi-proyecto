@@ -13,12 +13,16 @@ service cloud.firestore {
       allow write: if false; 
     }
 
-    // Contenido restringido (Soluciones, guiones de actor, debriefing, etc.)
-    // La seguridad se maneja en el frontend: la UI solo hace la consulta 
-    // si el usuario ingresa el codigo_staff correcto del evento.
+    // Contenido operativo separado por caso: lectura, escenario y debriefing.
+    // Durante el PMV la lectura es pública y el código staff se controla en el flujo de UI.
     match /casos_contenido/{casoId} {
       allow read: if true;
-      allow write: if false; 
+      allow write: if false;
+
+      match /secciones/{contenidoId} {
+        allow read: if true;
+        allow write: if false;
+      }
     }
 
     // Eventos y sus estaciones vinculadas

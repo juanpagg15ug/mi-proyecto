@@ -17,7 +17,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+if (!['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+  getAnalytics(app);
+}
 // Inicializamos la base de datos y la exportamos
 const db = getFirestore(app);
 
