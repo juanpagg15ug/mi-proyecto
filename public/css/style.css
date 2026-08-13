@@ -1,0 +1,21 @@
+/* Estilos globales básicos */
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #f3f4f6; 
+}
+
+/* Transiciones para las tarjetas y cuadrantes */
+.card { 
+    transition: all 0.3s ease; 
+}
+
+.quadrant { 
+    transition: all 0.3s ease; 
+}
+
+/* Estado activo del cuadrante seleccionado en la matriz */
+.active-quadrant { 
+    transform: scale(1.05); 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+    border-width: 2px; 
+}

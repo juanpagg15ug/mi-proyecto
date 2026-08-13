@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// PMV Proyecto Praxis — reglas simplificadas, sin IAM real (decisión consciente)
+// Lectura: abierta a todos para permitir validación en el cliente (UI).
+// Escritura: bloqueada desde la app — todo se crea/edita desde la consola de Firebase.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Catálogo público (visible sin evento)
+    match /casos/{casoId} {
+      allow read: if true;
+      allow write: if false; 
+    }
+
+    // Contenido restringido (Soluciones, guiones de actor, debriefing, etc.)
+    // La seguridad se maneja en el frontend: la UI solo hace la consulta 
+    // si el usuario ingresa el codigo_staff correcto del evento.
+    match /casos_contenido/{casoId} {
+      allow read: if true;
+      allow write: if false; 
+    }
+
+    // Eventos y sus estaciones vinculadas
+    match /eventos/{eventoId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /estaciones/{estacionId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // [PENDIENTE AL 15 DE AGOSTO] 
+    // Si Sandra confirma que sí hay competencia por equipos,
+    // descomentar esta colección.
+    /*
+    match /intentos/{intentoId} {
+      allow read: if true;
+      allow create: if true;  // El instructor necesita escribir puntaje en vivo
+      allow update, delete: if false;
+    }
+    */
+  }
+}
