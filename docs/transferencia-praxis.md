@@ -230,6 +230,25 @@ La consulta revisa las estaciones bajo
 estaciones, staff e instructores queda para una automatizacion futura; no se
 implementa todavia un dashboard administrativo.
 
+La UX de la herramienta esta organizada en pasos visibles: validar acceso y
+despues elegir una accion en la barra lateral. El panel derecho muestra solo
+una opcion a la vez: `Proponer ID`, `Planificar evento`, `Consultar caso` o
+`Proponer acceso`. Cada
+accion indica si lee datos o si solo prepara una propuesta; ninguna de estas
+acciones persiste cambios en el PMV.
+
+`Planificar evento` no se limita a generar un codigo. Recoge una ficha
+preliminar con prefijo institucional, tipo de evento, año, edicion, nombre,
+alcance, fecha, sede, estaciones previstas, responsable, casos publicados
+seleccionados y equipo/instructores previstos por rol. Los casos se cargan
+desde `casos` con `estado == publicado`; el equipo se captura como una nota
+preliminar porque el PMV no tiene una coleccion de usuarios ni asignaciones
+persistentes. Produce un
+`eventoId` como `{PREFIJO}-{TIPO}-{AÑO}-{EDICION}`, consulta
+`eventos/{eventoId}` para detectar colisiones y muestra una ruta sugerida en
+`SIM-POCUS/02_Eventos/`. No crea el evento, sus estaciones, usuarios ni
+permisos.
+
 ### Evento
 
 1. El participante introduce el ID del evento.

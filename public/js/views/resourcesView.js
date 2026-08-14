@@ -51,7 +51,10 @@ export function renderResourcesView(containerId, options = {}) {
             </div>
             <div class="space-y-8">
                 <section aria-labelledby="resource-tools-title">
-                    <h2 id="resource-tools-title" class="text-xl font-bold text-indigo-900 mb-3">Herramientas de trabajo</h2>
+                    <div class="mb-3">
+                        <h2 id="resource-tools-title" class="text-xl font-bold text-indigo-900">Herramientas de trabajo</h2>
+                        <p class="text-sm text-gray-600 mt-1">La calculadora ayuda a priorizar. La herramienta de IDs prepara nombres y claves para una configuración posterior; ninguna de las dos guarda cambios automáticamente.</p>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         ${tools.map((tool) => `
                             <article class="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">

@@ -37,6 +37,9 @@ export async function renderCatalogoView(containerId, options = {}) {
                 <h1 class="text-3xl font-bold text-indigo-900">Banco General Praxis</h1>
                 <p class="text-gray-600 mt-1">Explora los reportes y guiones de simulación disponibles.</p>
             </div>
+            <div class="bg-indigo-50 border border-indigo-100 rounded-lg px-4 py-3 mb-5 text-sm text-indigo-900">
+                <i class="fas fa-filter mr-2" aria-hidden="true"></i>Combina los filtros para reducir la lista. Si dejas todos en blanco, se muestran todos los casos publicados.
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
                 <select id="catalog-filter-type" class="p-3 border border-gray-300 rounded-lg bg-white text-sm" aria-label="Filtrar por tipo">
                     <option value="">Todos los tipos</option>

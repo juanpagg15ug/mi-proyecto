@@ -169,16 +169,46 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
         });
         container.querySelector('#btn-print-station')?.addEventListener('click', () => window.print());
         container.querySelector('#btn-instructor-access')?.addEventListener('click', () => {
-            const code = window.prompt('Introduce el código privado del instructor:');
-            if (code === null) return;
-            if (String(code).trim() !== String(caso.codigo_instructor || '').trim()) {
-                window.alert('El código privado no coincide.');
-                return;
-            }
-            renderCaseDetailView(containerId, casoId, {
-                ...options,
-                privateAccess: true
+            const dialog = document.createElement('div');
+            dialog.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4';
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
+            dialog.setAttribute('aria-labelledby', 'instructor-access-title');
+            dialog.innerHTML = `
+                <form id="instructor-access-form" class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+                    <h2 id="instructor-access-title" class="text-xl font-bold text-indigo-900">Acceso instructor</h2>
+                    <p class="mt-2 text-sm leading-6 text-gray-600">Este acceso permite revisar las secciones operativas de este caso fuera de un evento. En este PMV el código controla la interfaz; no sustituye autenticación.</p>
+                    <label for="instructor-access-code" class="block text-sm font-semibold text-gray-700 mt-5 mb-2">Código de acceso</label>
+                    <input id="instructor-access-code" type="password" class="w-full p-3 border border-gray-300 rounded-lg" autocomplete="off" required>
+                    <p id="instructor-access-error" class="text-sm text-red-700 mt-3 hidden" aria-live="polite"></p>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="cancel-instructor-access" type="button" class="border border-gray-300 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold">Continuar</button>
+                    </div>
+                </form>
+            `;
+            document.body.appendChild(dialog);
+            const close = () => dialog.remove();
+            dialog.querySelector('#cancel-instructor-access').addEventListener('click', close);
+            dialog.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') close();
             });
+            dialog.querySelector('#instructor-access-form').addEventListener('submit', (event) => {
+                event.preventDefault();
+                const code = dialog.querySelector('#instructor-access-code').value.trim();
+                const error = dialog.querySelector('#instructor-access-error');
+                if (code !== String(caso.codigo_instructor || '').trim()) {
+                    error.textContent = 'El código de acceso no coincide.';
+                    error.classList.remove('hidden');
+                    return;
+                }
+                close();
+                renderCaseDetailView(containerId, casoId, {
+                    ...options,
+                    privateAccess: true
+                });
+            });
+            dialog.querySelector('#instructor-access-code').focus();
         });
 
         if (options.role === 'estudiante' && options.timerMinutes) {
