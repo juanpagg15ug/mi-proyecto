@@ -60,9 +60,16 @@ especialidad
 eje_transversal
 resumen_publico
 estado
+codigo_instructor
 ```
 
 En el PMV, `estado` debe ser `publicado`.
+
+`codigo_instructor` permite abrir desde el catálogo las secciones `escenario` y
+`debriefing` de un caso que no necesariamente pertenece a un evento. En este
+PMV se valida en la interfaz; no es una protección de seguridad porque las
+reglas actuales permiten lectura pública. Debe sustituirse por Firebase
+Authentication y reglas por rol antes de usarlo para contenido sensible.
 
 ## Seccion lectura
 

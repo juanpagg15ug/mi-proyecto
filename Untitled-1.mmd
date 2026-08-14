@@ -1,0 +1,54 @@
+---
+references:
+  - "File: /public/js/app.js"
+  - "File: /public/js/offlineCache.js"
+  - "File: /public/js/views/caseDetailView.js"
+  - "File: /public/js/views/eventView.js"
+generationTime: 2026-08-13T05:45:29.073Z
+---
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> AppLifecycle : DOMContentLoaded
+
+    state AppLifecycle {
+        [*] --> Ready
+        Ready : entry / renderHeader(1)
+        Ready --> CatalogView : open_catalog
+        Ready --> EventEntryView : open_event
+        Ready --> CalculatorView : open_calculator
+        Ready --> ExitConfirm : exit_event_request
+
+        CatalogView --> CaseDetailView : select_case
+        CaseDetailView --> CatalogView : back_to_catalog
+
+        EventEntryView --> EventValidation : submit_access
+        EventValidation --> EventView : valid_event
+        EventValidation --> EventEntryView : invalid_code
+
+        EventView --> CaseDetailView : open_station
+        CaseDetailView --> EventView : back_to_stations
+        EventView --> ExitConfirm : exit_event_request
+
+        ExitConfirm --> Ready : cancel
+        ExitConfirm --> Ready : confirm_exit
+
+        --
+        [*] --> CacheIdle
+        CacheIdle : entry / inspect localStorage
+        CacheIdle --> CacheReading : readOffline
+        CacheReading --> CacheWriting : saveOffline
+        CacheWriting : exit / persist JSON snapshot
+        CacheWriting --> CacheIdle
+    }
+
+    AppLifecycle --> [*] : shutdown
+
+    note right of CaseDetailView
+        Reads metadata and operational content
+        from Firestore or from offline cache
+    end note
+
+    note right of EventView
+        Validates event code, staff access,
+        station mapping, and role-based view
+    end note
