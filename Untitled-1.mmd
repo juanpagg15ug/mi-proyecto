@@ -4,7 +4,7 @@ references:
   - "File: /public/js/offlineCache.js"
   - "File: /public/js/views/caseDetailView.js"
   - "File: /public/js/views/eventView.js"
-generationTime: 2026-08-13T05:45:29.073Z
+generationTime: 2026-08-14T16:06:19.228Z
 ---
 stateDiagram-v2
     [*] --> Idle
@@ -17,6 +17,7 @@ stateDiagram-v2
         Ready --> EventEntryView : open_event
         Ready --> CalculatorView : open_calculator
         Ready --> ExitConfirm : exit_event_request
+        Ready --> ResourcesView : open_resources
 
         CatalogView --> CaseDetailView : select_case
         CaseDetailView --> CatalogView : back_to_catalog
