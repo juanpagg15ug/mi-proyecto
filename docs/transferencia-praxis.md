@@ -335,6 +335,13 @@ no se presenta como paso obligatorio para autores. La metadata puede ser
 preparada por el autor con el formato indicado o entregada posteriormente por
 el coordinador/administrador.
 
+La implementacion de la UI refleja este flujo: la primera pantalla muestra
+tarjetas para elegir `Reporte de caso clinico academico`, `Guion de caso de
+simulacion clinica` o `Guia editorial de casos`. El boton `Entrar a la guia`
+abre una ficha con sus secciones, documentos Word descargables, expectativas de
+entrega y estructura del paquete. Las herramientas internas permanecen en una
+seccion separada y no forman parte del recorrido normal del autor.
+
 ### Notas de llenado de las plantillas
 
 Las plantillas Word oficiales contienen texto de diseño instruccional, notas de
@@ -668,6 +675,7 @@ Antes de publicar contenido:
 - [docs/firestore-pmv.md](firestore-pmv.md): contrato detallado vigente del PMV.
 - [firestore.rules](../firestore.rules): reglas de lectura y escritura actuales.
 - [firestore.indexes.json](../firestore.indexes.json): configuracion explicita de indices.
+- [ia-generacion-casos-praxis.md](ia-generacion-casos-praxis.md): memoria y prompt maestro para generar paquetes de casos con las plantillas oficiales.
 
 ### Centro de recursos publico
 
@@ -677,9 +685,29 @@ en formato Word desde:
 
 ```text
 public/docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx
-public/docs/oficiales/plantilla-2-guion-caso-simulacion-clinica.docx
 public/docs/oficiales/guia-editorial-casos.docx
 ```
+
+La guia de simulacion oficial esta separada por secciones y vive en:
+
+```text
+public/docs/oficiales/simulacion/current/
+├── 01_Lectura - v1Plantilla de Viñeta y Lectura Pública.docx
+├── 02_Escenario - v1Plantilla de Guion y Script del Instructor.docx
+└── 03_Debriefing - v1Plantilla de Facilitación y Listas de Cotejo.docx
+```
+
+La version anterior, de documento unico, se conserva solo como archivo
+historico en:
+
+```text
+public/docs/oficiales/simulacion/archive/v1/
+└── plantilla-2-guion-caso-simulacion-clinica.docx
+```
+
+El Centro de recursos presenta primero la guia y despues sus tres documentos.
+No debe ofrecer como plantilla activa el antiguo Word unico de simulacion ni
+usarlo como fuente para nuevas importaciones.
 
 Los archivos Markdown resumidos no son la fuente oficial visible del Centro de
 recursos. Pueden conservarse como apoyo técnico interno, pero no deben
