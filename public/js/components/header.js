@@ -13,6 +13,7 @@ export function renderHeader(estado = 1, datosContexto = {}) {
                     <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
                         <button id="btn-catalog" type="button" class="text-indigo-600 border-b-2 border-indigo-600 pb-1 cursor-pointer" aria-label="Abrir catálogo">Catálogo</button>
                         <a href="#evento" id="btn-ingresar-evento" class="text-gray-600 hover:text-indigo-900 transition">Ingresar a evento</a>
+                        <button id="btn-resources" type="button" class="text-gray-600 hover:text-indigo-900 transition" aria-label="Abrir centro de recursos">Recursos</button>
                         <span class="text-gray-300 cursor-not-allowed" title="Próximamente">Panel admin · Analítica</span>
                     </nav>
                 </div>

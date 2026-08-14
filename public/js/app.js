@@ -3,6 +3,7 @@ import { renderCatalogoView } from './views/catalogovView.js';
 import { renderCalculatorView } from './views/calculatorView.js';
 import { renderCaseDetailView } from './views/caseDetailView.js';
 import { renderEventEntry, renderEventView } from './views/eventView.js';
+import { renderResourcesView } from './views/resourcesView.js';
 
 let navigationToken = 0;
 let eventSessionActive = false;
@@ -35,6 +36,11 @@ function renderModuleSelector() {
                     <h2 class="text-xl font-bold">Ingresar a evento</h2>
                     <p class="text-sm text-indigo-200 mt-2">Usa el código del evento para cargar estaciones y rol.</p>
                 </button>
+                <button id="btn-open-resources" class="bg-emerald-50 p-6 rounded-xl shadow-sm border border-emerald-200 text-left hover:border-emerald-400 hover:shadow-md transition">
+                    <i class="fas fa-file-lines text-emerald-700 text-2xl mb-4"></i>
+                    <h2 class="text-xl font-bold text-emerald-950">Blueprints y guías</h2>
+                    <p class="text-sm text-emerald-800 mt-2">Consulta plantillas y criterios editoriales para crear casos.</p>
+                </button>
             </div>
             <button id="btn-open-calculator" type="button" class="mt-6 text-sm font-semibold text-gray-500 hover:text-indigo-700">Abrir herramienta de priorización</button>
         </section>
@@ -56,6 +62,13 @@ function renderCalculator() {
     startView();
     renderHeader(1);
     renderCalculatorView('app-container');
+    focusApp();
+}
+
+function renderResources() {
+    startView();
+    renderHeader(1);
+    renderResourcesView('app-container', { onBack: () => renderModuleSelector() });
     focusApp();
 }
 
@@ -161,6 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCalculator();
         } else if (target.id === 'btn-open-event') {
             renderEventEntryView();
+        } else if (target.id === 'btn-open-resources') {
+            renderResources();
         } else if (target.id === 'btn-home' || target.id === 'btn-back-home') {
             if (target.id === 'btn-home' && eventSessionActive) {
                 exitEvent();
@@ -171,6 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
             focusApp();
         } else if (target.id === 'btn-catalog') {
             renderCatalog();
+        } else if (target.id === 'btn-resources') {
+            renderResources();
         } else if (target.id === 'btn-ingresar-evento') {
             e.preventDefault();
             renderEventEntryView();
