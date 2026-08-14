@@ -1,12 +1,12 @@
 const resources = [
     {
-        group: 'Plantillas de casos',
+        group: 'Blueprints y plantillas',
         title: 'Blueprint A: Reportes de caso',
         description: 'Estructura de trabajo para metadata pública, lectura clínica, objetivos y revisión previa a publicación.',
         file: './docs/blueprint-a-casos.md'
     },
     {
-        group: 'Plantillas de casos',
+        group: 'Blueprints y plantillas',
         title: 'Blueprint B: Guion de simulación',
         description: 'Ejemplo de lectura, guion de actor, operación SimTech y guía de debriefing para una estación.',
         file: './docs/blueprint-b-via-aerea-dificil.md'
@@ -16,6 +16,21 @@ const resources = [
         title: 'Guía Editorial de Casos',
         description: 'Criterios públicos de estructura, estilo, citación, inclusión, anonimización y revisión pedagógica.',
         file: './docs/guia-editorial-casos.md'
+    }
+];
+
+const tools = [
+    {
+        title: 'Calculadora de priorización',
+        description: 'Evalúa valor, urgencia y esfuerzo para decidir qué caso o producto debe avanzar.',
+        icon: 'fa-calculator',
+        action: 'onOpenCalculator'
+    },
+    {
+        title: 'Proponer IDs y claves de acceso',
+        description: 'Prepara un caso_id, nombres de carpeta y candidatos de acceso, sin crear documentos ni activar claves.',
+        icon: 'fa-key',
+        action: 'onOpenKeyGenerator'
     }
 ];
 
@@ -31,10 +46,27 @@ export function renderResourcesView(containerId, options = {}) {
             </button>
             <div class="mb-8">
                 <span class="text-xs font-bold uppercase tracking-wide text-emerald-700">Centro de recursos</span>
-                <h1 class="text-3xl font-bold text-indigo-900 mt-2">Blueprints y guías Praxis</h1>
-                <p class="text-gray-600 mt-2 max-w-3xl">Material de referencia para diseñar, revisar y preparar casos clínicos y guiones de simulación. La documentación técnica interna no se publica aquí.</p>
+                <h1 class="text-3xl font-bold text-indigo-900 mt-2">Centro de recursos Praxis</h1>
+                <p class="text-gray-600 mt-2 max-w-3xl">Material editorial y herramientas de trabajo para diseñar, revisar y preparar casos clínicos y guiones de simulación.</p>
             </div>
             <div class="space-y-8">
+                <section aria-labelledby="resource-tools-title">
+                    <h2 id="resource-tools-title" class="text-xl font-bold text-indigo-900 mb-3">Herramientas de trabajo</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${tools.map((tool) => `
+                            <article class="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wide text-slate-600">Herramienta interna PMV</span>
+                                    <h3 class="text-lg font-bold text-indigo-900 mt-2"><i class="fas ${tool.icon} text-slate-600 mr-2"></i>${tool.title}</h3>
+                                    <p class="text-sm leading-6 text-gray-600 mt-2">${tool.description}</p>
+                                </div>
+                                <button data-resource-action="${tool.action}" class="inline-flex items-center justify-center gap-2 mt-6 bg-slate-700 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-lg transition" type="button">
+                                    <i class="fas fa-arrow-right"></i> Abrir herramienta
+                                </button>
+                            </article>
+                        `).join('')}
+                    </div>
+                </section>
                 ${groups.map((group) => `
                     <section aria-labelledby="resource-group-${group.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}">
                         <h2 id="resource-group-${group.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}" class="text-xl font-bold text-indigo-900 mb-3">${group}</h2>
@@ -59,4 +91,7 @@ export function renderResourcesView(containerId, options = {}) {
     `;
 
     container.querySelector('#btn-back-resources').addEventListener('click', () => options.onBack?.());
+    container.querySelectorAll('[data-resource-action]').forEach((button) => {
+        button.addEventListener('click', () => options[button.dataset.resourceAction]?.());
+    });
 }

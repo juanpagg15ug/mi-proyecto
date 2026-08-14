@@ -82,10 +82,12 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
                 return;
             }
             caso = casoSnapshot.data();
+            caso.id = casoId;
             saveOffline('case-meta', casoId, caso);
         } catch (error) {
             caso = readOffline('case-meta', casoId);
             if (!caso) throw error;
+            caso.id = casoId;
             offlineMode = true;
         }
         if (options.token && container.dataset.viewToken !== options.token) return;

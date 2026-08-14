@@ -61,6 +61,17 @@ estado: borrador | en_revision | publicado | archivado
 
 `codigo_instructor` es un control visual temporal del PMV. No es seguridad real y debera sustituirse por Firebase Authentication y reglas por rol.
 
+Para la herramienta independiente de claves existe tambien el documento global:
+
+```text
+configuracion/accesos
+  codigo_instructor: "VALOR_PRIVADO_DEL_PMV"
+```
+
+Este documento habilita el generador antes de que exista un `casoId`. No debe
+confundirse con el `codigo_instructor` que puede conservar cada caso para la
+revision fuera de evento.
+
 ### Contenido del caso
 
 El contenido vive fuera del documento publico, pero conserva el mismo `casoId`:
@@ -172,6 +183,52 @@ Un caso puede ser publico y no pertenecer a ningun evento. Un evento solo crea u
 4. La vista muestra las pestañas completas.
 
 Este acceso es funcional para el PMV, pero el codigo se compara en el navegador y las reglas actuales permiten lectura publica. Por tanto, una persona con acceso tecnico podria leer los documentos directamente.
+
+### Generador de claves del caso
+
+Desde la pantalla inicial se puede abrir una herramienta independiente de
+claves, similar a la calculadora de priorizacion. Solicita unicamente el codigo
+global de `configuracion/accesos`, despues presenta dropdowns para año, producto,
+area y eje/categoria, y genera el siguiente numero disponible. No es un
+dashboard administrativo y no escribe en Firestore ni en Google Drive. Deriva
+valores para copiar y mantener consistencia editorial:
+
+```text
+ID Firestore / caso_id: {casoId}
+Carpeta de Google Drive: {casoId}__{producto}__{especialidad}__{subcategoria}
+Secciones: lectura | escenario | debriefing
+```
+
+La herramienta tiene dos acciones separadas:
+
+```text
+Generar propuesta:
+  Lee los casos existentes, calcula el siguiente NN y no escribe en Firestore.
+
+Consultar caso existente:
+  Recibe un casoId ya creado, lee su metadata y muestra sus relaciones reales.
+```
+
+La propuesta usa el formato `{PREFIJO}-{AREA}-{AÑO}-{NN}`. El dropdown de
+prefijo ofrece `SIM` para casos Praxis/SIM-POCUS, `URL` para casos vinculados a
+la Universidad Rafael Landívar y `REP` como opción futura para reportes. El
+prefijo y `NN` se
+eligen manualmente en dropdowns; no se calcula un incremento automatico. Esto
+evita colisiones entre propuestas que nunca se publicaron y casos que si
+existen en Firestore. Antes de mostrar la propuesta, la herramienta consulta
+`casos/{casoId}` y la rechaza si la clave ya existe. La propuesta tambien
+normaliza los valores para producir un nombre estable de carpeta y una ruta
+jerarquica de Google Drive:
+
+```text
+SIM-POCUS/01_Banco_General/{producto}/{especialidad}/{categoria}/{nombre_de_carpeta}
+```
+
+La consulta revisa las estaciones bajo
+`eventos/{eventoId}/estaciones/{estacionId}` y muestra las coincidencias por
+`caso_id`. La generación de codigos para eventos,
+estaciones, staff e instructores queda para una automatizacion futura; no se
+implementa todavia un dashboard administrativo.
 
 ### Evento
 
@@ -337,6 +394,30 @@ desde el header del catalogo. Publica copias controladas de:
 public/docs/blueprint-a-casos.md
 public/docs/blueprint-b-via-aerea-dificil.md
 public/docs/guia-editorial-casos.md
+```
+
+El mismo Centro de recursos concentra tambien las herramientas internas del
+PMV:
+
+```text
+Calculadora de priorizacion
+Proponer IDs y claves de acceso
+```
+
+La calculadora se abre directamente. El generador solicita primero el codigo
+global de instructor y despues muestra los dropdowns para proponer un `casoId`,
+consultar un caso existente o proponer una clave de acceso para instructor,
+staff o participante. El inicio no muestra accesos separados para estas
+herramientas; el Centro de recursos funciona como su punto comun de entrada.
+
+Las claves propuestas son candidatas locales: no se guardan, no se reservan y
+no quedan activas. Para que una clave funcione debe registrarse posteriormente
+en el documento o flujo correspondiente. No confundir:
+
+```text
+ID de caso       = identificador Firestore, por ejemplo SIM-AN-2026-01
+Clave propuesta  = candidato generado por la herramienta
+Clave activa     = valor configurado en Firestore y usado por la aplicacion
 ```
 
 No copiar a `public/` la transferencia tecnica, `firestore-pmv.md`, las reglas,

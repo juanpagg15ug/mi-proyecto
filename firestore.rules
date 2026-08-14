@@ -13,6 +13,12 @@ service cloud.firestore {
       allow write: if false; 
     }
 
+    // Configuracion PMV para habilitar herramientas internas; no es seguridad real.
+    match /configuracion/{configId} {
+      allow read: if configId == 'accesos';
+      allow write: if false;
+    }
+
     // Contenido operativo separado por caso: lectura, escenario y debriefing.
     // Durante el PMV la lectura es pública y el código staff se controla en el flujo de UI.
     match /casos_contenido/{casoId} {

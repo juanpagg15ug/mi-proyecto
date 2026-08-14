@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "npx firebase-tools@latest emulators:start --only hosting,firestore",
-    "validate": "node --check public/js/app.js && node --check public/js/components/header.js && node --check public/js/views/catalogovView.js && node --check public/js/views/caseDetailView.js && node --check public/js/views/eventView.js && node --check public/js/views/resourcesView.js && node --check public/js/offlineCache.js && node --check public/js/views/calculatorView.js && node --check public/js/views/calculatorTemplate.js",
+    "validate": "node --check public/js/app.js && node --check public/js/components/header.js && node --check public/js/views/catalogovView.js && node --check public/js/views/caseDetailView.js && node --check public/js/views/eventView.js && node --check public/js/views/resourcesView.js && node --check public/js/views/caseKeyGeneratorView.js && node --check public/js/offlineCache.js && node --check public/js/views/calculatorView.js && node --check public/js/views/calculatorTemplate.js",
     "emulators": "npx firebase-tools@latest emulators:start --only hosting,firestore",
     "deploy:rules": "npx firebase-tools@latest use praxis-prio && npx firebase-tools@latest deploy --only firestore:rules",
     "deploy:hosting": "npx firebase-tools@latest use praxis-prio && npx firebase-tools@latest deploy --only hosting"
