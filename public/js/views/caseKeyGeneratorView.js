@@ -169,8 +169,12 @@ export function renderCaseKeyGeneratorView(containerId, options = {}) {
                     <p class="text-sm text-gray-600 mt-1">Selecciona casos que podrían formar parte del evento. Esto no crea estaciones ni cambia los casos.</p>
                     <label for="event-key-cases" class="block text-sm font-semibold text-gray-700 mt-3 mb-2">Casos del evento</label>
                     <select id="event-key-cases" class="w-full p-3 border border-gray-300 rounded-lg" multiple size="5"><option value="">Cargando casos publicados...</option></select>
-                    <label for="event-key-team" class="block text-sm font-semibold text-gray-700 mt-4 mb-2">Equipo e instructores previstos</label>
-                    <textarea id="event-key-team" rows="4" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Ej. Instructor: Sandra\nSimTech: Juan\nActor: Pendiente"></textarea>
+                    <label for="event-key-lead" class="block text-sm font-semibold text-gray-700 mt-4 mb-2">Instructor líder</label>
+                    <input id="event-key-lead" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Ej. Sandra" required>
+                    <label for="event-key-assistants" class="block text-sm font-semibold text-gray-700 mt-4 mb-2">Instructores asistentes</label>
+                    <textarea id="event-key-assistants" rows="3" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Un nombre por línea\nEj. Juan\nMaría"></textarea>
+                    <label for="event-key-team" class="block text-sm font-semibold text-gray-700 mt-4 mb-2">Equipo operativo adicional</label>
+                    <textarea id="event-key-team" rows="3" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="SimTech: Juan\nActor: Pendiente"></textarea>
                 </div>
                 <button class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-4 py-3 rounded-lg" type="submit"><i class="fas fa-calendar-check mr-2"></i>Proponer planificación</button>
                 <div id="event-key-output"></div>
@@ -257,7 +261,7 @@ export function renderCaseKeyGeneratorView(containerId, options = {}) {
             estaciones: container.querySelector('#event-key-stations').value || 'Pendiente de planificación',
             responsable: container.querySelector('#event-key-owner').value.trim(),
             casos: Array.from(container.querySelector('#event-key-cases').selectedOptions).map((option) => option.value).filter(Boolean),
-            equipo: container.querySelector('#event-key-team').value.trim(),
+            equipo: `Instructor líder: ${container.querySelector('#event-key-lead').value.trim()}\nInstructores asistentes: ${container.querySelector('#event-key-assistants').value.trim() || 'Ninguno asignado'}\n${container.querySelector('#event-key-team').value.trim() || 'Equipo operativo pendiente'}`,
             year
         };
         const eventId = buildEventId(prefix, type, year, edition);

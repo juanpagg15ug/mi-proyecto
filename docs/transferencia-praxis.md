@@ -240,7 +240,8 @@ acciones persiste cambios en el PMV.
 `Planificar evento` no se limita a generar un codigo. Recoge una ficha
 preliminar con prefijo institucional, tipo de evento, año, edicion, nombre,
 alcance, fecha, sede, estaciones previstas, responsable, casos publicados
-seleccionados y equipo/instructores previstos por rol. Los casos se cargan
+seleccionados, instructor lider, instructores asistentes y equipo operativo
+previsto por rol. Los casos se cargan
 desde `casos` con `estado == publicado`; el equipo se captura como una nota
 preliminar porque el PMV no tiene una coleccion de usuarios ni asignaciones
 persistentes. Produce un
