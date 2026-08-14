@@ -292,6 +292,53 @@ El sistema no puede recuperar por primera vez un caso que nunca se haya cargado 
 
 Crear un preparador offline de evento que descargue y verifique el paquete necesario antes del taller. Para datos reservados, no publicar `escenario` ni `debriefing` como archivos estaticos dentro de `public/`, porque cualquier URL de Hosting seria descargable. Para esa capa se requiere cache autorizado, IndexedDB, paquete cifrado o una aplicacion/entorno controlado.
 
+### Hallazgo pendiente: alineacion con plantillas oficiales
+
+Las plantillas oficiales de SIM-POCUS distinguen entre Reporte de Caso Clinico
+Academico y Guion de Caso de Simulacion Clinica, y contienen mas metadata y
+secciones que el contrato minimo del PMV. Por el momento no se cambia el
+modelo vigente ni se migran documentos.
+
+El contrato actual se considera suficiente para el PMV y conserva estos campos
+compatibles:
+
+```text
+titulo
+tipo
+especialidad
+eje_transversal
+resumen_publico
+estado
+codigo_instructor
+```
+
+Como hallazgo para una fase posterior, las plantillas oficiales sugieren
+evaluar campos comunes como:
+
+```text
+autores
+afiliaciones
+nivel_formacion
+palabras_clave
+duracion_briefing_minutos
+duracion_escenario_minutos
+duracion_debriefing_minutos
+recursos_necesarios
+integracion_inclusion
+```
+
+Para Reportes Academicos se debera evaluar la representacion de resumen,
+introduccion, presentacion cronologica, discusion, conclusiones, referencias
+APA 7 y anexos anonimizados. Para Guiones de Simulacion se debera evaluar
+briefing, pacto de ficcion, confidencialidad, estado inicial, progresion,
+acciones esperadas, respuestas del simulador, pistas, criterios de parada y
+las fases `captar`, `comprender` y `concluir` del debriefing.
+
+Decision actual: **no implementar este cambio durante el PMV**. Antes de una
+migracion se debe revisar el contenido real de las tres plantillas oficiales,
+definir un esquema versionado compatible y preparar una estrategia de
+backfill. No renombrar los campos actuales sin una migracion planificada.
+
 ## 7. Taxonomia del Banco General
 
 El arbol visual debe construirse con metadata, no con colecciones anidadas de Firestore. Todos los casos permanecen en `casos/{casoId}` y la interfaz los agrupa por campos.
@@ -408,13 +455,18 @@ Antes de publicar contenido:
 ### Centro de recursos publico
 
 La aplicacion incluye una vista `Centro de recursos` accesible desde el inicio y
-desde el header del catalogo. Publica copias controladas de:
+desde el header del catalogo. La interfaz debe mostrar las plantillas oficiales
+en formato Word desde:
 
 ```text
-public/docs/blueprint-a-casos.md
-public/docs/blueprint-b-via-aerea-dificil.md
-public/docs/guia-editorial-casos.md
+public/docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx
+public/docs/oficiales/plantilla-2-guion-caso-simulacion-clinica.docx
+public/docs/oficiales/guia-editorial-casos.docx
 ```
+
+Los archivos Markdown resumidos no son la fuente oficial visible del Centro de
+recursos. Pueden conservarse como apoyo técnico interno, pero no deben
+reemplazar las plantillas Word.
 
 El mismo Centro de recursos concentra tambien las herramientas internas del
 PMV:

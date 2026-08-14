@@ -1,21 +1,24 @@
 const resources = [
     {
-        group: 'Blueprints y plantillas',
-        title: 'Blueprint A: Reportes de caso',
-        description: 'Estructura de trabajo para metadata pública, lectura clínica, objetivos y revisión previa a publicación.',
-        file: './docs/blueprint-a-casos.md'
+        group: 'Plantillas oficiales',
+        title: 'Plantilla 1: Reporte de Caso Clínico Académico',
+        description: 'Documento Word oficial para redactar y revisar reportes de casos clínicos académicos.',
+        file: './docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx',
+        download: true
     },
     {
-        group: 'Blueprints y plantillas',
-        title: 'Blueprint B: Guion de simulación',
-        description: 'Ejemplo de lectura, guion de actor, operación SimTech y guía de debriefing para una estación.',
-        file: './docs/blueprint-b-via-aerea-dificil.md'
+        group: 'Plantillas oficiales',
+        title: 'Plantilla 2: Guion de Caso de Simulación Clínica',
+        description: 'Documento Word oficial para preparar briefing, escenario, roles, evaluación y debriefing.',
+        file: './docs/oficiales/plantilla-2-guion-caso-simulacion-clinica.docx',
+        download: true
     },
     {
-        group: 'Guías editoriales',
+        group: 'Plantillas oficiales',
         title: 'Guía Editorial de Casos',
-        description: 'Criterios públicos de estructura, estilo, citación, inclusión, anonimización y revisión pedagógica.',
-        file: './docs/guia-editorial-casos.md'
+        description: 'Documento Word oficial con normas de estilo, citación, inclusión, anonimización y revisión pedagógica.',
+        file: './docs/oficiales/guia-editorial-casos.docx',
+        download: true
     }
 ];
 
@@ -81,8 +84,8 @@ export function renderResourcesView(containerId, options = {}) {
                                         <h3 class="text-lg font-bold text-indigo-900 mt-2">${resource.title}</h3>
                                         <p class="text-sm leading-6 text-gray-600 mt-2">${resource.description}</p>
                                     </div>
-                                    <a class="inline-flex items-center justify-center gap-2 mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg transition" href="${resource.file}" target="_blank" rel="noopener">
-                                        <i class="fas fa-book-open"></i> Abrir documento
+                                    <a class="inline-flex items-center justify-center gap-2 mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg transition" href="${resource.file}" ${resource.download ? 'download' : 'target="_blank" rel="noopener"'}>
+                                        <i class="fas fa-file-word"></i> Descargar Word
                                     </a>
                                 </article>
                             `).join('')}
