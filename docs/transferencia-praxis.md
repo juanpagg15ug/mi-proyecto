@@ -489,6 +489,12 @@ simtech    -> escenario
 instructor -> lectura + escenario + debriefing
 ```
 
+La vista de evento aplica tambien esa matriz a las pestañas y a los enlaces de
+fuente editorial: Actor ve su guion, SimTech ve su script e Instructor ve las
+secciones completas. Esto es control de interfaz del PMV; las reglas de
+Firestore siguen permitiendo lectura publica y deberan endurecerse con
+Authentication antes de tratarlo como seguridad real.
+
 ## 6. Respaldo offline vigente
 
 El archivo [public/js/offlineCache.js](../public/js/offlineCache.js) guarda en `localStorage` durante 24 horas:

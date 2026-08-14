@@ -8,6 +8,11 @@ const tabs = [
     { id: 'debriefing', label: 'Debriefing', source: 'debriefing', fields: ['contenido', 'debriefing', 'checklist'] }
 ];
 
+const roleTabs = {
+    actor: [{ id: 'actor', label: 'Actor', source: 'escenario', fields: ['guion_actor'] }],
+    simtech: [{ id: 'simtech', label: 'SimTech', source: 'escenario', fields: ['script_desarrollo'] }]
+};
+
 let activeTimer = null;
 
 function getTabValue(content, tab, role) {
@@ -16,17 +21,14 @@ function getTabValue(content, tab, role) {
 
     if (tab.id === 'clinica' && role === 'estudiante') {
         fields = ['vignette_estudiante', 'contenido', 'ficha_tecnica'];
-    } else if (tab.id === 'simtech' && role === 'actor') {
-        fields = ['guion_actor', 'contenido', 'script_desarrollo'];
-    } else if (tab.id === 'simtech' && role === 'simtech') {
-        fields = ['script_desarrollo', 'contenido', 'guion_actor'];
     }
 
     return fields.map((field) => source[field]).find(Boolean);
 }
 
 function renderTabContent(content, activeTab, role) {
-    const tab = tabs.find((item) => item.id === activeTab) || tabs[0];
+    const availableTabs = [...tabs, ...Object.values(roleTabs).flat()];
+    const tab = availableTabs.find((item) => item.id === activeTab) || tabs[0];
     const value = getTabValue(content, tab, role);
 
     if (!value) {
@@ -39,8 +41,7 @@ function renderTabContent(content, activeTab, role) {
 function tabsForRole(role, isEvent, privateAccess) {
     if (!isEvent && privateAccess) return tabs;
     if (!isEvent || role === 'estudiante') return tabs.slice(0, 1);
-    if (role === 'actor') return tabs.slice(0, 2);
-    if (role === 'simtech') return tabs.slice(1, 2);
+    if (role === 'actor' || role === 'simtech') return roleTabs[role];
     return tabs;
 }
 
@@ -68,13 +69,22 @@ function missingContentSections(content, sectionIds) {
     });
 }
 
-function renderSourceLinks(content) {
+function renderSourceLinks(content, role, isEvent) {
     const labels = {
         lectura: 'Documento maestro de lectura',
         escenario: 'Documento maestro de escenario',
         debriefing: 'Documento maestro de debriefing'
     };
-    const links = Object.entries(content).map(([sectionId, section]) => {
+    const allowedSections = !isEvent || role === 'instructor'
+        ? Object.keys(content)
+        : role === 'estudiante'
+            ? ['lectura']
+            : role === 'actor'
+                ? ['lectura', 'escenario']
+                : role === 'simtech'
+                    ? ['escenario']
+                    : ['lectura'];
+    const links = Object.entries(content).filter(([sectionId]) => allowedSections.includes(sectionId)).map(([sectionId, section]) => {
         const url = section.fuente_google_doc_url || section.fuente_google_drive_url;
         if (!url) return '';
         return `<a href="${url}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50"><i class="fab fa-google-drive text-green-700"></i>${labels[sectionId] || `Fuente de ${sectionId}`}</a>`;
@@ -167,7 +177,7 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
                     </div>
                     <h1 class="text-3xl font-bold text-indigo-900">${caso.titulo || 'Caso sin título'}</h1>
                     <p class="text-gray-600 mt-2">${caso.resumen_publico || 'Sin resumen público disponible.'}</p>
-                    ${renderSourceLinks(content)}
+                    ${renderSourceLinks(content, options.role, isEvent)}
                     ${options.role ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-800 text-sm font-semibold"><i class="fas fa-user-tag"></i> Vista activa: ${options.role}</div>` : ''}
                     ${!isEvent && options.privateAccess ? '<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 text-sm font-semibold"><i class="fas fa-lock-open"></i> Acceso instructor activo</div>' : ''}
                     ${options.role === 'estudiante' && options.timerMinutes ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 text-amber-800 text-sm font-semibold"><i class="fas fa-clock"></i> Tiempo restante: <span id="student-timer">${formatTime(options.timerMinutes * 60)}</span></div>` : ''}
