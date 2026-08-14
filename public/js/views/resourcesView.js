@@ -1,24 +1,34 @@
 const resources = [
     {
-        group: 'Plantillas oficiales',
-        title: 'Plantilla 1: Reporte de Caso Clínico Académico',
-        description: 'Documento Word oficial para redactar y revisar reportes de casos clínicos académicos.',
-        file: './docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx',
-        download: true
+        id: 'report',
+        group: 'Guías y plantillas',
+        title: 'Reporte de caso clínico académico',
+        description: 'Guía y plantilla oficial para preparar un reporte clínico académico.',
+        icon: 'fa-file-medical',
+        files: [{ title: 'Plantilla 1: Reporte de Caso Clínico Académico', description: 'Documento Word oficial para redactar y revisar reportes académicos.', file: './docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx' }],
+        package: ['00_Metadata/metadata.json', '01_Reporte/reporte.docx', '02_Referencias/']
     },
     {
-        group: 'Plantillas oficiales',
-        title: 'Plantilla 2: Guion de Caso de Simulación Clínica',
-        description: 'Documento Word oficial para preparar briefing, escenario, roles, evaluación y debriefing.',
-        file: './docs/oficiales/plantilla-2-guion-caso-simulacion-clinica.docx',
-        download: true
+        id: 'simulation',
+        group: 'Guías y plantillas',
+        title: 'Guion de caso de simulación clínica',
+        description: 'Paquete de tres secciones para preparar lectura, escenario y facilitación.',
+        icon: 'fa-person-chalkboard',
+        files: [
+            { title: '01_Lectura: Viñeta y lectura pública', description: 'Documento Word oficial para la información que verá el participante.', file: './docs/oficiales/01-lectura-v1-plantilla-vineta-lectura-publica.docx', pending: true },
+            { title: '02_Escenario: Guion y script del instructor', description: 'Documento Word oficial para escenario, acciones, respuestas y operación.', file: './docs/oficiales/02-escenario-v1-plantilla-guion-script-instructor.docx', pending: true },
+            { title: '03_Debriefing: Facilitación y listas de cotejo', description: 'Documento Word oficial para debriefing, preguntas y evaluación.', file: './docs/oficiales/03-debriefing-v1-plantilla-facilitacion-listas-cotejo.docx', pending: true }
+        ],
+        package: ['00_Metadata/metadata.json', '01_Lectura/lectura.docx', '02_Escenario/escenario.docx', '03_Debriefing/debriefing.docx']
     },
     {
-        group: 'Plantillas oficiales',
-        title: 'Guía Editorial de Casos',
-        description: 'Documento Word oficial con normas de estilo, citación, inclusión, anonimización y revisión pedagógica.',
-        file: './docs/oficiales/guia-editorial-casos.docx',
-        download: true
+        id: 'editorial',
+        group: 'Guías y plantillas',
+        title: 'Guía editorial de casos',
+        description: 'Normas oficiales de estilo, citación, inclusión, anonimización y revisión.',
+        icon: 'fa-pen-ruler',
+        files: [{ title: 'Guía Editorial de Casos', description: 'Documento Word oficial de referencia editorial.', file: './docs/oficiales/guia-editorial-casos.docx' }],
+        package: ['Plantilla oficial', 'metadata.json cuando se prepare un caso', 'Paquete de entrega para revisión']
     }
 ];
 
@@ -53,6 +63,28 @@ export function renderResourcesView(containerId, options = {}) {
                 <p class="text-gray-600 mt-2 max-w-3xl">Material editorial y herramientas de trabajo para diseñar, revisar y preparar casos clínicos y guiones de simulación.</p>
             </div>
             <div class="space-y-8">
+                <aside class="bg-amber-50 border border-amber-200 rounded-xl p-5" aria-labelledby="resource-import-notice-title">
+                    <span class="text-xs font-bold uppercase tracking-wide text-amber-700">Antes de descargar</span>
+                    <h2 id="resource-import-notice-title" class="text-lg font-bold text-amber-950 mt-1">Cómo entregar un caso</h2>
+                    <p class="text-sm leading-6 text-amber-900 mt-2">Las plantillas Word son partes de un paquete de caso. Para entregar un caso necesitarás completar los documentos correspondientes y acompañarlos con un archivo <span class="font-mono">metadata.json</span>.</p>
+                    <ul class="text-sm leading-6 text-amber-900 list-disc pl-5 mt-3">
+                        <li>Descarga y completa las plantillas sin código de acceso.</li>
+                        <li>Guarda todo en una carpeta del caso con <span class="font-mono">00_Metadata/metadata.json</span>.</li>
+                        <li>Puedes preparar la metadata con el formato indicado o solicitar el archivo al coordinador/administrador.</li>
+                        <li>Entrega el paquete para revisión clínica, pedagógica y editorial.</li>
+                        <li>La importación futura validará el paquete antes de escribir en el sistema.</li>
+                        <li>No compartas códigos dentro de los archivos de metadata ni de contenido.</li>
+                        <li>Las notas de llenado de las plantillas deben retirarse; el importador las detectará y advertirá si siguen presentes.</li>
+                    </ul>
+                    <div class="mt-4 rounded-lg bg-white/70 border border-amber-200 p-3 text-sm text-amber-950">
+                        <p class="font-semibold">Paquete esperado</p>
+                        <code class="block whitespace-pre-wrap mt-1">Caso/
+├── 00_Metadata/metadata.json
+├── 01_Lectura/lectura.docx
+├── 02_Escenario/escenario.docx
+└── 03_Debriefing/debriefing.docx</code>
+                    </div>
+                </aside>
                 <section aria-labelledby="resource-tools-title">
                     <div class="mb-3">
                         <h2 id="resource-tools-title" class="text-xl font-bold text-indigo-900">Herramientas de trabajo</h2>
@@ -92,6 +124,17 @@ export function renderResourcesView(containerId, options = {}) {
                         </div>
                     </section>
                 `).join('')}
+                <section class="bg-slate-50 border border-slate-200 rounded-xl p-5" aria-labelledby="resource-package-title">
+                    <span class="text-xs font-bold uppercase tracking-wide text-slate-600">Paquete de entrega</span>
+                    <h2 id="resource-package-title" class="text-xl font-bold text-indigo-900 mt-1">Cómo se organiza un caso</h2>
+                    <p class="text-sm text-gray-600 mt-2">La metadata acompaña a las carpetas de contenido. No es una sección clínica: identifica el caso, sus documentos, versión, fuentes y estado de revisión.</p>
+                    <code class="block whitespace-pre-wrap bg-white border border-slate-200 rounded-lg p-4 mt-4 text-sm text-slate-800">Caso/
+├── 00_Metadata/metadata.json
+├── 01_Lectura/lectura.docx
+├── 02_Escenario/escenario.docx
+└── 03_Debriefing/debriefing.docx</code>
+                    <p class="text-xs text-slate-600 mt-3">Las plantillas y la estructura se pueden descargar sin código. El generador de IDs y relaciones es una herramienta interna para coordinadores y administradores.</p>
+                </section>
             </div>
         </section>
     `;

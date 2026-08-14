@@ -237,6 +237,223 @@ una opcion a la vez: `Proponer ID`, `Planificar evento`, `Consultar caso` o
 accion indica si lee datos o si solo prepara una propuesta; ninguna de estas
 acciones persiste cambios en el PMV.
 
+Las salidas pueden descargarse localmente como JSON:
+
+```text
+Proponer ID       -> metadata-{casoId}.json
+Planificar evento -> metadata-evento-{eventoId}.json
+Consultar caso    -> informe-{casoId}.json
+```
+
+La descarga no crea ni modifica documentos en Firestore, Google Drive o
+Firebase Storage. Es un archivo de trabajo para revisión y posterior carga
+manual.
+
+### Compatibilidad futura con importacion
+
+Las descargas de metadata se consideran el contrato preliminar para un futuro
+flujo de importacion de casos y eventos. No deben tratarse solo como informes
+visuales. El importador futuro debera poder leer `schema_version`, validar los
+IDs, comprobar colisiones y convertir el archivo en documentos Firestore sin
+depender de nombres visibles de la interfaz.
+
+Archivos de trabajo previstos:
+
+```text
+metadata-{casoId}.json
+  -> propuesta de caso y referencias a sus secciones/fuentes
+
+metadata-evento-{eventoId}.json
+  -> propuesta de evento, casos seleccionados, estaciones y equipo previsto
+
+informe-{casoId}.json
+  -> salida de consulta para lectura humana; no es un archivo de importacion
+```
+
+La descarga de plantillas y la preparacion de metadata no requieren codigo de
+acceso. La metadata puede generarse desde las herramientas de propuesta o ser
+entregada por el coordinador/administrador. El requisito de autorizacion
+aplica al futuro importador cuando este tenga capacidad de escribir en el
+sistema, y la metadata nunca debe incluir el codigo secreto:
+
+```json
+{
+  "schema_version": "praxis.case.package.v1",
+  "importacion": {
+    "metadata_preparada": true,
+    "autorizacion_para_escritura": "requerida_en_importador",
+    "metodo": "codigo_del_sistema_o_autenticacion",
+    "contacto_si_no_hay_acceso": "Coordinador o administrador de Praxis"
+  }
+}
+```
+
+No guardar `codigo_instructor`, `codigo_staff` ni ninguna clave activa dentro
+de `metadata.json`. El importador deberá solicitar autorización solo al
+momento de escribir; si no existe, mostrará que se debe contactar al
+coordinador o administrador del sistema. Preparar o descargar el archivo no
+debe quedar bloqueado por ese código.
+
+La expectativa para autores debe comunicarse antes de descargar las plantillas:
+una entrega no consiste solo en archivos Word. El paquete esperado es:
+
+```text
+Caso/
+├── 00_Metadata/metadata.json
+├── 01_Lectura/lectura.docx
+├── 02_Escenario/escenario.docx
+└── 03_Debriefing/debriefing.docx
+```
+
+El autor puede descargar las plantillas y preparar `metadata.json` con el
+formato indicado, sin acceder al generador interno. El coordinador/administrador
+puede generar una primera version de metadata y entregarla al autor. Despues el paquete pasa
+por revision clinica, pedagogica y editorial. La autorizacion se solicitara
+solo cuando exista un importador con capacidad de escribir en el sistema.
+
+La nota sobre `metadata.json` debe aparecer junto a la estructura de carpetas y
+las secciones que el autor va a descargar, porque forma parte del paquete de
+entrega. La herramienta de propuestas repite la aclaracion al abrirse para
+mantener el contexto, pero no debe convertirse en requisito para descargar las
+plantillas. El generador de IDs, relaciones y planificación si solicita codigo:
+es una herramienta interna para coordinadores y administradores, ya que revela
+procesos que un usuario comun no necesita conocer.
+
+El Centro de recursos sigue un flujo de dos niveles para autores:
+
+```text
+Centro de recursos
+  -> Elegir tipo de guía
+  -> Entrar a la guía
+  -> Ver sus secciones y documentos Word
+  -> Revisar expectativas de entrega e importación
+  -> Descargar los archivos necesarios
+```
+
+El generador interno de IDs y relaciones aparece como herramienta separada y
+no se presenta como paso obligatorio para autores. La metadata puede ser
+preparada por el autor con el formato indicado o entregada posteriormente por
+el coordinador/administrador.
+
+### Notas de llenado de las plantillas
+
+Las plantillas Word oficiales contienen texto de diseño instruccional, notas de
+llenado, ejemplos y marcadores para el autor. Esos elementos ayudan a completar
+el documento, pero no son contenido publicable del caso.
+
+El importador futuro debe:
+
+1. Detectar notas de plantilla por estilos, marcadores, etiquetas y patrones
+   conocidos.
+2. Mostrar una advertencia con el archivo, sección y texto detectado.
+3. Indicar si la importación es bloqueante o si permite limpieza automática.
+4. No publicar nunca las notas como `vignette_estudiante`, `script_desarrollo`,
+   `debriefing` o cualquier otro campo operativo.
+5. Ofrecer dos políticas explícitas:
+
+```text
+Modo revisión:
+  Detiene la importación y pide al autor retirar las notas manualmente.
+
+Modo limpieza autorizada:
+  Elimina únicamente patrones de notas conocidos, muestra una previsualización
+  del texto resultante y exige confirmación antes de continuar.
+```
+
+Si el sistema no puede distinguir con seguridad una nota de instrucciones del
+contenido real, debe marcarla como `requiere_revision` y bloquear la publicación
+en lugar de borrarla silenciosamente. El informe de validación deberá incluir:
+
+```text
+archivo
+seccion
+tipo: nota_de_llenado | marcador | ejemplo | contenido_ambiguo
+severidad: advertencia | bloqueante
+accion_recomendada
+```
+
+Reglas para mantener compatibilidad:
+
+1. Conservar `schema_version` en cada archivo.
+2. Mantener `caso_id`, `evento_id`, `estacion_id` y `casos_contenido` como nombres canonicos.
+3. Separar propuestas de estados persistidos: `borrador`, `en_revision`, `publicado` y `archivado`.
+4. No generar automaticamente numeros que no hayan sido reservados o creados.
+5. Validar colisiones contra Firestore antes de importar.
+6. No importar enlaces de Drive como permisos; solo como referencias (`id`, `url`, `folder_id`).
+7. Mantener las relaciones evento-caso en estaciones mediante `caso_id`.
+8. Permitir que el importador rechace el archivo completo y muestre errores por campo antes de escribir.
+
+El importador tambien debera generar un resultado visible en la interfaz. No
+debe limitarse a un mensaje generico como `Importacion fallida`.
+
+Formato conceptual del resultado:
+
+```json
+{
+  "resultado": "rechazado | listo_para_importar | importacion_parcial",
+  "alcance": "archivo_completo | registros_parciales",
+  "total_registros": 4,
+  "validos": 3,
+  "rechazados": 1,
+  "errores": [
+    {
+      "registro": "casos/SIM-AN-2026-03",
+      "campo": "caso_id",
+      "codigo": "ID_DUPLICADO",
+      "motivo": "El documento ya existe en Firestore.",
+      "accion": "Elegir otro ID o revisar el caso existente."
+    }
+  ]
+}
+```
+
+La interfaz debera informar claramente:
+
+- que archivo se reviso;
+- cuantos registros contiene;
+- cuantos son validos;
+- cuantos fueron rechazados;
+- el campo y registro que causan cada error;
+- el motivo del rechazo en lenguaje comprensible;
+- si se rechazo el archivo completo o solo algunos registros;
+- si existe una accion disponible para corregir y volver a validar.
+
+Politica de carga:
+
+```text
+Rechazo completo:
+  Un error estructural, de esquema o de relaciones invalida todo el archivo.
+
+Carga parcial:
+  Solo se permite si cada registro es independiente y la interfaz muestra
+  exactamente cuales entrarian y cuales quedarian fuera.
+
+Sin escritura:
+  Si existe cualquier error, el importador debe detenerse antes de escribir
+  salvo que la persona confirme explicitamente una carga parcial valida.
+```
+
+El resumen previo a confirmar debe presentar una tabla o lista de cambios con
+estado `valido`, `advertencia` o `rechazado`. El usuario debe poder descargar
+tambien el informe de validacion para conservar la razon de rechazo y corregir
+el archivo original.
+
+El futuro flujo recomendado sera:
+
+```text
+Descargar metadata
+  -> Revisar JSON
+  -> Importar archivo
+  -> Validar esquema y relaciones
+  -> Mostrar errores, advertencias y alcance de carga
+  -> Mostrar resumen de cambios
+  -> Confirmar carga completa o parcial
+  -> Crear/actualizar documentos Firestore
+```
+
+Hasta que ese flujo exista, las descargas permanecen locales y no tienen
+efecto de escritura.
+
 `Planificar evento` no se limita a generar un codigo. Recoge una ficha
 preliminar con prefijo institucional, tipo de evento, año, edicion, nombre,
 alcance, fecha, sede, estaciones previstas, responsable, casos publicados

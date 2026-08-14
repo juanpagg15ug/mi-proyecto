@@ -19,6 +19,16 @@ function randomAccessKey(prefix) {
     return `${prefix}-${suffix}`;
 }
 
+function downloadJson(filename, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+}
+
 function renderOutput(caseId, caso, drivePath = '') {
     const productKey = slugifyKey(caso.producto || caso.tipo || 'caso');
     const specialtyKey = slugifyKey(caso.especialidad || 'general');
@@ -68,6 +78,7 @@ function renderEventProposal(eventId, data) {
                 <div><dt class="font-semibold text-amber-900">Equipo previsto</dt><dd class="text-amber-950 whitespace-pre-line">${data.equipo || 'Pendiente de asignación'}</dd></div>
                 <div><dt class="font-semibold text-amber-900">Carpeta Google Drive</dt><dd class="font-mono text-amber-950 break-all">SIM-POCUS/02_Eventos/${data.year}/${driveFolder}</dd></div>
             </dl>
+            <button id="btn-download-event-metadata" class="mt-5 bg-white border border-amber-300 text-amber-900 font-semibold px-4 py-2 rounded-lg hover:bg-amber-100" type="button"><i class="fas fa-download mr-2"></i>Descargar metadata del evento</button>
         </section>
     `;
 }
@@ -106,8 +117,12 @@ export function renderCaseKeyGeneratorView(containerId, options = {}) {
             <div class="mb-8">
                 <span class="text-xs font-bold uppercase tracking-wide text-emerald-700">Herramienta interna PMV</span>
                 <h1 class="text-3xl font-bold text-indigo-900 mt-2">Proponer IDs y claves de acceso</h1>
-                <p class="text-gray-600 mt-2">Prepara identificadores para casos y candidatos de acceso. Nada de lo generado aquí se guarda ni queda activo automáticamente.</p>
+                <p class="text-gray-600 mt-2">Herramienta interna para coordinadores y administradores: prepara identificadores, relaciones y candidatos de acceso. Nada de lo generado aquí se guarda ni queda activo automáticamente.</p>
             </div>
+            <aside class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-950" aria-label="Información para autores">
+                <p class="font-semibold">Para entregar un caso</p>
+                <p class="mt-1 leading-6">Acompaña las plantillas Word con <span class="font-mono">00_Metadata/metadata.json</span>. El generador está protegido porque expone procesos internos de IDs, relaciones y planificación; solicita el código al coordinador o administrador. Las plantillas y la estructura del paquete no requieren código.</p>
+            </aside>
             <ol class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-6 text-sm" aria-label="Pasos de la herramienta">
                 <li class="bg-emerald-50 border border-emerald-200 rounded-lg p-3"><strong>1. Acceso</strong><span class="block text-emerald-800 mt-1">Valida el código.</span></li>
                 <li class="bg-slate-50 border border-slate-200 rounded-lg p-3"><strong>2. Propuesta</strong><span class="block text-slate-700 mt-1">Prepara un ID sin guardar.</span></li>
@@ -244,6 +259,22 @@ export function renderCaseKeyGeneratorView(containerId, options = {}) {
             return;
         }
         output.innerHTML = `<div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-amber-900">Propuesta disponible. No se ha creado ningún documento en Firestore.</div>${renderOutput(caseId, caseData, buildDrivePath(caseId, caseData))}`;
+            output.innerHTML = `<div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-amber-900">Propuesta disponible. No se ha creado ningún documento en Firestore.</div>${renderOutput(caseId, caseData, buildDrivePath(caseId, caseData))}<button id="btn-download-case-proposal" class="mt-4 bg-white border border-indigo-300 text-indigo-800 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-50" type="button"><i class="fas fa-download mr-2"></i>Descargar metadata del caso</button>`;
+            container.querySelector('#btn-download-case-proposal').addEventListener('click', () => downloadJson(`metadata-${caseId}.json`, {
+                schema_version: 'praxis.case.v1',
+                caso_id: caseId,
+                producto: product,
+                especialidad: specialtyKey,
+                subcategoria_catalogo: category,
+                estado: 'borrador',
+                importacion: {
+                    requiere_autorizacion: true,
+                    metodo: 'codigo_del_sistema_o_autenticacion',
+                    contacto_si_no_hay_acceso: 'Coordinador o administrador de Praxis',
+                    notas_plantilla: 'detectar_y_revisar_antes_de_publicar'
+                },
+                fuente: 'Propuesta local; no persistida'
+            }));
     });
 
     container.querySelector('#event-planning-form').addEventListener('submit', async (event) => {
@@ -288,6 +319,27 @@ export function renderCaseKeyGeneratorView(containerId, options = {}) {
             message.className = 'text-sm text-emerald-700';
             message.textContent = 'Caso encontrado. Consultando relaciones...';
             output.innerHTML = renderOutput(caseId, snapshot.data(), buildDrivePath(caseId, snapshot.data()));
+                        output.innerHTML = renderOutput(caseId, snapshot.data(), buildDrivePath(caseId, snapshot.data())) + '<button id="btn-download-case-report" class="mt-4 bg-white border border-emerald-300 text-emerald-800 font-semibold px-4 py-2 rounded-lg hover:bg-emerald-50" type="button"><i class="fas fa-download mr-2"></i>Descargar informe de consulta</button>';
+                        container.querySelector('#btn-download-case-report').addEventListener('click', () => downloadJson(`informe-${caseId}.json`, {
+                            schema_version: 'praxis.case.report.v1',
+                            caso_id: caseId,
+                            metadata: snapshot.data(),
+                            relaciones: 'Consultar relaciones en la interfaz para obtener el estado actual',
+                            generado_en: new Date().toISOString()
+                        }));
+                    container.querySelector('#btn-download-event-metadata').addEventListener('click', () => downloadJson(`metadata-evento-${eventId}.json`, {
+                        schema_version: 'praxis.event.v1',
+                        evento_id: eventId,
+                        ...data,
+                        estado: 'borrador',
+                        importacion: {
+                            requiere_autorizacion: true,
+                            metodo: 'codigo_del_sistema_o_autenticacion',
+                            contacto_si_no_hay_acceso: 'Coordinador o administrador de Praxis',
+                            notas_plantilla: 'detectar_y_revisar_antes_de_publicar'
+                        },
+                        fuente: 'Propuesta local; no persistida'
+                    }));
             const relationsOutput = document.createElement('div');
             relationsOutput.className = 'mt-4 text-sm';
             output.querySelector('section').appendChild(relationsOutput);

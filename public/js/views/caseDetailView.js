@@ -59,6 +59,30 @@ function hasOperationalContent(content) {
     }));
 }
 
+function missingContentSections(content, sectionIds) {
+    return sectionIds.filter((sectionId) => {
+        const section = content[sectionId] || {};
+        return !Object.entries(section).some(([key, value]) => {
+            return !['fuente_google_doc_id', 'fuente_google_doc_url', 'version', 'actualizado_en'].includes(key) && Boolean(value);
+        });
+    });
+}
+
+function renderSourceLinks(content) {
+    const labels = {
+        lectura: 'Documento maestro de lectura',
+        escenario: 'Documento maestro de escenario',
+        debriefing: 'Documento maestro de debriefing'
+    };
+    const links = Object.entries(content).map(([sectionId, section]) => {
+        const url = section.fuente_google_doc_url || section.fuente_google_drive_url;
+        if (!url) return '';
+        return `<a href="${url}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50"><i class="fab fa-google-drive text-green-700"></i>${labels[sectionId] || `Fuente de ${sectionId}`}</a>`;
+    }).filter(Boolean);
+    if (!links.length) return '';
+    return `<div class="mt-5"><p class="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Fuente editorial</p><div class="flex flex-wrap gap-2">${links.join('')}</div><p class="text-xs text-gray-500 mt-2">El contenido mostrado en la plataforma corresponde al snapshot publicado en Firestore.</p></div>`;
+}
+
 export async function renderCaseDetailView(containerId, casoId, options = {}) {
     const container = document.getElementById(containerId);
     if (!container || !casoId) return;
@@ -103,6 +127,8 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
         }
         if (options.token && container.dataset.viewToken !== options.token) return;
         if (!hasOperationalContent(content)) {
+            const missingSections = missingContentSections(content, sectionIds);
+            const expectedPaths = missingSections.map((sectionId) => `casos_contenido/${casoId}/secciones/${sectionId}`);
             container.innerHTML = `
                 <section class="max-w-4xl mx-auto py-6">
                     ${offlineMode ? offlineNotice() : ''}
@@ -110,8 +136,13 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
                         <i class="fas fa-arrow-left mr-2"></i>${options.backLabel || 'Volver al catálogo'}
                     </button>
                     <div class="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-900">
-                        <h1 class="text-xl font-bold">Caso sin contenido operativo</h1>
-                        <p class="mt-2">Este caso no tiene contenido operativo disponible para este rol.</p>
+                        <h1 class="text-xl font-bold">Contenido del caso pendiente</h1>
+                        <p class="mt-2">La metadata de <span class="font-mono">casos/${casoId}</span> existe, pero las secciones que necesita esta vista todavía no tienen contenido utilizable.</p>
+                        <div class="mt-4 text-sm">
+                            <p class="font-semibold">Rutas que debes completar:</p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1">${expectedPaths.map((path) => `<li class="font-mono break-all">${path}</li>`).join('')}</ul>
+                        </div>
+                        <p class="mt-4 text-sm">Las plantillas Word del Centro de recursos no se copian automáticamente a Firestore. Debes transcribir o revisar el contenido del caso y guardarlo con los nombres de campo del contrato.</p>
                     </div>
                 </section>
             `;
@@ -136,6 +167,7 @@ export async function renderCaseDetailView(containerId, casoId, options = {}) {
                     </div>
                     <h1 class="text-3xl font-bold text-indigo-900">${caso.titulo || 'Caso sin título'}</h1>
                     <p class="text-gray-600 mt-2">${caso.resumen_publico || 'Sin resumen público disponible.'}</p>
+                    ${renderSourceLinks(content)}
                     ${options.role ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-800 text-sm font-semibold"><i class="fas fa-user-tag"></i> Vista activa: ${options.role}</div>` : ''}
                     ${!isEvent && options.privateAccess ? '<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 text-sm font-semibold"><i class="fas fa-lock-open"></i> Acceso instructor activo</div>' : ''}
                     ${options.role === 'estudiante' && options.timerMinutes ? `<div class="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 text-amber-800 text-sm font-semibold"><i class="fas fa-clock"></i> Tiempo restante: <span id="student-timer">${formatTime(options.timerMinutes * 60)}</span></div>` : ''}
