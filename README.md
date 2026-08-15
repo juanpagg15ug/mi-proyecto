@@ -156,6 +156,8 @@ prioriza `current`, mientras la nueva versión continúa su revisión en
   evaluación, prioridades, criterios de aceptación y fases de mejora.
 - [Plan futuro de evolución arquitectónica](docs/plan-migracion-arquitectura-react.md):
   dominio ligero, separación por capas y evaluación progresiva de React.
+- [Plan futuro de orquestación e interoperabilidad](docs/plan-evolucion-orquestacion-interoperabilidad.md):
+  frontera poseer/integrar/referenciar, modo autónomo y pilotos con proveedores externos.
 - [Memoria editorial para IA](docs/ia-generacion-casos-praxis.md): generación y
   revisión de contenido con las plantillas oficiales.
 - [ADR 0006: versionado y ciclo editorial por scope](docs/decisiones/0006-versionado-y-ciclo-editorial-por-scope.md):

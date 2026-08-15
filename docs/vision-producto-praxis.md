@@ -252,3 +252,4 @@ reales antes de convertirse en objetivos.
 - [ADR 0005: experiencia, interfaz y accesibilidad](decisiones/0005-experiencia-interfaz-y-accesibilidad.md)
 - [ADR 0006: versionado y ciclo editorial por scope](decisiones/0006-versionado-y-ciclo-editorial-por-scope.md)
 - [Plan del importador editorial](importador-praxis.md)
+- [Plan futuro de orquestación e interoperabilidad](plan-evolucion-orquestacion-interoperabilidad.md)
