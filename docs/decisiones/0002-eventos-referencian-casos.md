@@ -30,13 +30,22 @@ eventos/{eventoId}/estaciones/{estacionId}
 `casos_contenido`. Las secciones canónicas son `lectura`, `escenario` y
 `debriefing`; no usan IDs automáticos.
 
+El nombre o título visible de un caso es metadata mutable y no es su identidad.
+Renombrar el caso o los encabezados de sus secciones en Google Docs tampoco
+cambia `casoId`, `sectionId` ni las referencias de las estaciones. Esos cambios
+editoriales solo llegan a Firestore mediante una publicación explícita del
+snapshot. En cambio, cambiar un `casoId` o uno de los IDs canónicos de sección
+es una migración de datos y referencias, no una corrección editorial.
+
 ## Consecuencias
 
 - Un caso puede estar publicado sin evento.
 - Un evento no duplica contenido clínico.
 - Varias estaciones pueden reutilizar el mismo caso.
 - El rol y el contexto determinan qué secciones carga la interfaz.
-- Eliminar o renombrar un caso requiere revisar todas sus estaciones.
+- Cambiar el título o nombre visible no obliga a modificar las estaciones.
+- Eliminar un caso o cambiar su `casoId` requiere revisar y actualizar todas sus
+  estaciones, además de las rutas de contenido asociadas.
 - El importador debe validar relaciones antes de escribir.
 
 ## Alternativa descartada

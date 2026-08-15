@@ -46,6 +46,17 @@ representar privilegios globales estables como `admin` o `coordinador`. Las
 asignaciones de autor, revisor, instructor, actor o SimTech viven en documentos
 consultables y auditables.
 
+La experiencia distingue el modo de entrada, la vista funcional y el rol
+asignado. Durante el PMV, un código compartido de staff solo habilita una
+`vista simulada`; elegir Instructor, Actor o SimTech no afirma que la persona
+tenga ese rol. Con IAM, la interfaz obtiene las vistas permitidas desde las
+asignaciones de la identidad y no permite seleccionar roles ajenos.
+
+El respaldo offline no guarda ni vuelve a validar secretos. Una experiencia
+protegida solo puede continuar desde un contexto autorizado previamente y con
+alcance limitado. El caché de un evento debe excluir `codigo_staff`, tokens y
+cualquier otra credencial.
+
 ## Consecuencias
 
 - Ocultar un botón no constituye autorización.
@@ -57,6 +68,8 @@ consultables y auditables.
 - El código público de evento puede desacoplarse gradualmente de `evento_id`.
 - `codigo_staff` y `codigo_instructor` dejan de ser seguridad cuando existan
   asignaciones IAM equivalentes.
+- La interfaz no presenta una vista simulada como identidad o permiso real.
+- Los secretos no forman parte del respaldo offline.
 
 ## Migración incremental
 
@@ -69,3 +82,6 @@ consultables y auditables.
 7. Retirar códigos compartidos como controles de seguridad.
 
 Los nombres actuales del PMV no se cambian sin una migración planificada.
+
+La presentación y transición de estos estados se define en el
+[ADR 0005: Experiencia, interfaz y accesibilidad](0005-experiencia-interfaz-y-accesibilidad.md).

@@ -128,6 +128,8 @@ firebase.json           Hosting, Firestore y emuladores
   operación actual.
 - [Plan del importador](docs/importador-praxis.md): selección, validación,
   custodia, transformación y publicación.
+- [Hallazgos y plan de acción UX/UI](docs/hallazgos-plan-ux-ui-accesibilidad.md):
+  evaluación, prioridades, criterios de aceptación y fases de mejora.
 - [Memoria editorial para IA](docs/ia-generacion-casos-praxis.md): generación y
   revisión de contenido con las plantillas oficiales.
 - [Decisiones arquitectónicas](docs/decisiones/): decisiones duraderas y sus
