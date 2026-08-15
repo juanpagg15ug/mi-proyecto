@@ -21,8 +21,11 @@ El PMV incluye:
 
 El pipeline editorial automatizado todavía no está implementado. La preparación
 de contenido ocurre en Google Docs y el snapshot de Firestore se carga
-manualmente. El siguiente módulo planificado es el importador editorial descrito
-en [docs/importador-praxis.md](docs/importador-praxis.md).
+manualmente. El siguiente módulo técnico planificado es el importador editorial
+descrito en [docs/importador-praxis.md](docs/importador-praxis.md). En paralelo,
+la ruta de producto exige validar el flujo actual en eventos pequeños y medir
+continuidad, recuperación, coordinación y papel según
+[docs/transferencia-praxis.md](docs/transferencia-praxis.md).
 
 ## Límite de seguridad del PMV
 
@@ -162,6 +165,8 @@ prioriza `current`, mientras la nueva versión continúa su revisión en
   frontera poseer/integrar/referenciar, modo autónomo y pilotos con proveedores externos.
 - [Mapa de decisiones arquitectónicas candidatas](docs/mapa-decisiones-arquitectonicas-candidatas.md):
   temas extrapolables, evidencia requerida y criterios para promoverlos a ADR.
+- [Procedimiento de evaluación de capacidades](docs/procedimiento-evaluacion-capacidades.md):
+  filtros de valor, arquitectura, seguridad, UX y operación antes de implementar.
 - [Memoria editorial para IA](docs/ia-generacion-casos-praxis.md): generación y
   revisión de contenido con las plantillas oficiales.
 - [ADR 0006: versionado y ciclo editorial por scope](docs/decisiones/0006-versionado-y-ciclo-editorial-por-scope.md):

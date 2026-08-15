@@ -301,6 +301,11 @@ retiro propios.
 
 ## 8. Gobierno de portafolio
 
+Las capacidades se evalúan mediante el
+[procedimiento de evaluación](procedimiento-evaluacion-capacidades.md), que
+separa valor, arquitectura, seguridad, UX y operación antes de autorizar un
+experimento o promoción.
+
 Toda capacidad candidata debe declarar:
 
 - problema y población;
@@ -313,9 +318,9 @@ Toda capacidad candidata debe declarar:
 - criterio de avance;
 - criterio de detención o retiro.
 
-El dashboard operacional, scoreboard, integraciones y automatizaciones no se
-priorizan por visibilidad. Avanzan cuando reducen una fricción o riesgo medible
-de la experiencia.
+El dashboard operacional, scoreboard, experiencia documental integrada,
+integraciones y automatizaciones no se priorizan por visibilidad. Avanzan
+cuando reducen una fricción o riesgo medible de la experiencia.
 
 El scoreboard competitivo requiere además una decisión pedagógica, privacidad
 y seguridad psicológica; no se deriva automáticamente de disponer de datos.
@@ -372,6 +377,7 @@ legacy sin una justificación vigente.
 
 ## 12. Relación con decisiones y planes
 
+- [Procedimiento de evaluación de capacidades](procedimiento-evaluacion-capacidades.md): convierte los filtros en una puerta reutilizable.
 - [Visión de producto](vision-producto-praxis.md): define tesis, unidad de valor y métricas iniciales.
 - [Transferencia vigente](transferencia-praxis.md): registra estado implementado y siguiente entrega.
 - [Mapa de decisiones candidatas](mapa-decisiones-arquitectonicas-candidatas.md): gobierna la promoción de temas a ADR.

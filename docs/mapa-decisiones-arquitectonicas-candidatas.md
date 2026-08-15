@@ -70,6 +70,7 @@ temas candidatos de este mapa.
 | Fijar release o snapshot por experiencia | Hipótesis de producto | Casos, estaciones, eventos, caché | Modelo de identidad, migración y corrección urgente |
 | Estrategia por capacidad para migración y legacy | Guardrail propuesto | Datos, frontend, proveedores e infraestructura | Inventario de consumidores, rollback, retención y condición de salida |
 | Separar estado editorial y de publicación | Aplicado localmente por ADR 0006 | Casos, importador, recursos | Benchmark por scope y compatibilidad de estados actuales |
+| Experiencia documental integrada o externa | Capacidad candidata en descubrimiento | Centro de recursos, eventos, autoría y revisión | Prueba por formato, rol y dispositivo; continuidad, permisos, accesibilidad y offline |
 
 ## 5. Familias de decisión
 
@@ -155,7 +156,92 @@ Posible resultado futuro: ADR específica para releases de casos y referencias
 desde estaciones. El modelo de carpetas del Centro de recursos no se copia a
 Firestore.
 
+### Experiencia documental
+
+Actualmente los PDF se abren en una pestaña nueva y los Word se descargan. Esa
+línea base es simple y conserva fidelidad, pero puede romper el contexto de
+Praxis, aumentar cambios de ventana y dificultar el retorno durante una
+experiencia.
+
+La candidata no consiste únicamente en incrustar archivos. Debe decidir qué
+experiencia corresponde a cada propósito:
+
+```text
+Consulta publicada
+  -> lectura rápida y estable de una versión concreta
+
+Consulta operacional
+  -> material correcto para rol, estación y release, con retorno seguro
+
+Revisión editorial
+  -> comentarios, comparación y aprobación con identidad y trazabilidad
+
+Autoría colaborativa
+  -> edición en la fuente maestra, posiblemente Google Docs
+```
+
+Opciones que deben compararse:
+
+| Opción | Ventaja posible | Riesgo o límite |
+| --- | --- | --- |
+| Pestaña externa o descarga | Bajo acoplamiento y fidelidad del formato | Pérdida de contexto y más navegación |
+| Vista previa embebida del proveedor | Implementación rápida para documentos autorizados | Cookies, permisos, bloqueo de iframe, dependencia y accesibilidad |
+| Visor PDF dentro de Praxis | Navegación, búsqueda y retorno integrados | Peso, móvil, impresión, accesibilidad y mantenimiento |
+| Contenido estructurado nativo | Mejor adaptación por rol, responsive y offline | Transformación, pérdida de fidelidad y duplicación |
+| Enlace de edición a Google Docs | Colaboración y fuente maestra existentes | Cambio de contexto y permisos externos |
+| Autoría nativa en Praxis | Flujo unificado y reglas propias | Scope de editor completo, conflictos y alto costo |
+
+Google Drive y Docs API permiten seleccionar, leer, exportar, custodiar y
+transformar documentos; no proporcionan por sí solas un editor colaborativo
+embebido equivalente a Google Docs. Un enlace o preview tampoco sustituye
+autorización de Praxis ni garantiza acceso offline.
+
+La decisión puede ser híbrida por formato y tarea. Por ejemplo, contenido
+operacional estructurado dentro de Praxis, PDF con visor integrado, Word como
+descarga y autoría mediante enlace controlado a Google Docs.
+
+Preguntas de evaluación:
+
+1. ¿Qué tarea se interrumpe hoy por abrir otra pestaña?
+2. ¿Qué formatos y tamaños aparecen realmente?
+3. ¿Debe consultarse, anotarse, revisarse o editarse?
+4. ¿Qué release debe quedar fijado y cómo se evita mostrar una revisión nueva?
+5. ¿Qué roles pueden ver el documento completo o solo contenido derivado?
+6. ¿Qué ocurre sin conexión o si Google no está disponible?
+7. ¿El visor conserva teclado, lector de pantalla, zoom, búsqueda e impresión?
+8. ¿Funciona en dispositivos móviles usados durante una estación?
+9. ¿Cómo vuelve la persona al contexto exacto de Praxis?
+10. ¿El beneficio compensa dependencia, carga y mantenimiento?
+
+Métricas candidatas:
+
+- tiempo para localizar y abrir el material correcto;
+- cambios de pestaña, pérdidas de contexto y retornos fallidos;
+- documentos abiertos con versión o rol incorrectos;
+- finalización de tareas por móvil, teclado y lector de pantalla;
+- tiempo de carga, errores de permisos y disponibilidad offline;
+- papel o descargas evitadas sin perder contingencia;
+- preferencia y errores comparados con la línea base externa.
+
+Puerta para experimentar:
+
+> Un piloto identifica una tarea frecuente donde la pestaña externa produce
+> fricción medible y dispone de un documento no sensible o correctamente
+> protegido para comparar ambas experiencias.
+
+Puerta para soportar:
+
+> La opción integrada mejora continuidad y finalización sin degradar permisos,
+> accesibilidad, fidelidad, rendimiento, recuperación ni modo standalone.
+
+Posible resultado futuro: una decisión de experiencia documental por scope y
+tipo de contenido. No se debe adoptar un único visor o editor para toda Praxis
+solo por disponer de APIs.
+
 ## 6. Criterios para promover a ADR
+
+Antes de promover una candidata se aplica el
+[procedimiento de evaluación de capacidades](procedimiento-evaluacion-capacidades.md).
 
 Una candidata puede promoverse cuando:
 
@@ -175,6 +261,7 @@ una posibilidad futura sin decisión inmediata.
 ```text
 Eventos pequeños reales
   -> releases fijados y modelo operacional
+  -> prueba acotada de consulta documental en una tarea observada
   -> identidad, afiliación y asignaciones contextuales
   -> restricciones de recursos y rotaciones
   -> proveedor local y modo Standalone

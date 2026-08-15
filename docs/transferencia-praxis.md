@@ -66,7 +66,31 @@ final.
   una validación operativa completa en un evento real.
 - No existe suite automatizada de pruebas unitarias, de reglas o end-to-end.
 
-## 3. Siguiente implementación acordada
+## 3. Ruta inmediata alineada con la visión
+
+Praxis se encuentra como PMV funcional previo a validación operacional
+repetida. La siguiente ruta no es una sola feature: combina una entrega técnica
+con evidencia en experiencias reales.
+
+```text
+Línea operacional
+  -> probar eventos pequeños, recuperación, roles y continuidad
+
+Línea editorial
+  -> validar y custodiar contenido mediante el importador
+
+Línea de confianza
+  -> cerrar defectos, seguridad, pruebas y contingencia
+
+Línea de evidencia
+  -> medir coordinación, papel, incidencias y valor por actor
+```
+
+Las líneas avanzan de forma coordinada. La implementación editorial no debe
+posponer indefinidamente la prueba del flujo de evento, y un piloto no debe
+publicar contenido sin validación ni ignorar los límites de seguridad.
+
+### 3.1 Siguiente implementación técnica
 
 La siguiente pieza es el importador editorial en:
 
@@ -96,6 +120,67 @@ El primer alcance incluye:
 
 El diseño completo, las fases y los criterios de aceptación están en
 [importador-praxis.md](importador-praxis.md).
+
+La primera entrega ejecutable del importador corresponde a validación sin
+escritura: autenticación del coordinador, selección explícita, lectura de
+metadata, validaciones y reporte. Custodia, transformación, escritura y
+publicación se habilitan por fases cuando cumplan sus propias puertas de
+seguridad y operación.
+
+### 3.2 Validación operacional paralela
+
+Antes de considerar el producto validado se requieren eventos pequeños, de
+preferencia con alcance controlado de hasta 20 participantes:
+
+1. seleccionar uno o dos casos revisados y estaciones manejables;
+2. preparar contenido y acceso para participante, instructor, actor y SimTech;
+3. ejecutar junto al proceso habitual y conservar contingencia;
+4. introducir una interrupción o recuperación controlada;
+5. registrar dudas de versión, búsquedas, mensajes, papel e intervenciones;
+6. cerrar con observaciones de coordinación, facilitación y participantes;
+7. decidir qué corregir, repetir, soportar o retirar antes del siguiente evento.
+
+El congreso u otro evento de mayor exposición no debe ser el primer uso real.
+Debe recibir una versión estabilizada a partir de pilotos previos y congelar
+alcance con tiempo suficiente para ensayo y contingencia.
+
+### 3.3 Valor por actor
+
+La ruta no exige construir la misma cantidad para cada actor, pero cada entrega
+debe declarar a quién beneficia y qué recorridos no puede degradar.
+
+| Actor | Valor que debe comprobar Praxis |
+| --- | --- |
+| Coordinación | Menos búsquedas, mensajes paralelos, dudas de versión e intervenciones durante el evento |
+| Participante | Entrada comprensible, contexto correcto, siguiente acción y recuperación sin exposición de contenido reservado |
+| Instructor o facilitador | Caso y debriefing correctos, tiempo, estado de estación y capacidad de resolver incidencias |
+| Actor | Guion y respuestas correspondientes a la estación y release utilizados |
+| SimTech | Montaje, materiales, progresión y cambios operacionales visibles |
+| Autor | Plantillas claras, borrador revisable y vacíos explícitos sin exigir conocimiento técnico interno |
+| Revisión y publicación | Validaciones, custodia, vista previa, trazabilidad y bloqueo de publicaciones incompletas |
+| Institución | Operación reproducible, menor dependencia del papel, límites de datos y evidencia para decidir integración o escala |
+
+### 3.4 Puerta del horizonte inmediato
+
+El horizonte inmediato se considera completo cuando:
+
+- al menos un evento pequeño produce evidencia operacional utilizable;
+- los defectos críticos encontrados tienen decisión y responsable;
+- el contenido utilizado puede identificarse y reconstruirse;
+- la recuperación y el respaldo proporcional fueron probados;
+- el importador valida un paquete sin escribir ni publicar silenciosamente;
+- se establece línea base de coordinación, incidencias y papel;
+- la siguiente prioridad se decide con esos resultados, no solo con el plan
+  previo.
+
+Esto no convierte dashboard, scoreboard, rotaciones avanzadas u Odoo en
+entregas inmediatas. Esas capacidades permanecen candidatas hasta que los
+pilotos demuestren la fricción y los datos que deben resolver.
+
+La experiencia documental integrada también permanece candidata. Los PDF y
+documentos continúan con apertura externa o descarga hasta comparar, en una
+tarea observada, continuidad, permisos, accesibilidad, móvil, offline y
+fidelidad frente a un visor o contenido nativo.
 
 ## 4. Fuera del primer importador
 
@@ -278,6 +363,8 @@ No desplegar contenido clínico de borrador, placeholders o fuentes sin revisar.
 - [ ] Precargar eventos y casos antes de operar sin conexión.
 - [ ] Guardar respaldo PDF por estación.
 - [ ] Validar el flujo online y offline en condiciones reales.
+- [ ] Ejecutar un piloto pequeño y registrar incidencias, recuperación y actores afectados.
+- [ ] Establecer línea base de coordinación, búsquedas, mensajes y papel por evento.
 - [ ] Corregir descargas y consulta de relaciones del generador.
 - [ ] Alinear metadata del generador con `praxis.case.package.v1`.
 - [ ] Implementar la fase A del importador sin escritura.
@@ -285,6 +372,10 @@ No desplegar contenido clínico de borrador, placeholders o fuentes sin revisar.
 ## 10. Documentos de referencia
 
 - [README del proyecto](../README.md)
+- [Visión de producto](vision-producto-praxis.md)
+- [Ciclo de vida del producto](ciclo-vida-producto-praxis.md)
+- [Mapa de decisiones arquitectónicas candidatas](mapa-decisiones-arquitectonicas-candidatas.md)
+- [Plan futuro de orquestación e interoperabilidad](plan-evolucion-orquestacion-interoperabilidad.md)
 - [Contrato Firestore del PMV](firestore-pmv.md)
 - [Plan del importador](importador-praxis.md)
 - [Memoria editorial para IA](ia-generacion-casos-praxis.md)

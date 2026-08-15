@@ -243,6 +243,8 @@ reales antes de convertirse en objetivos.
 - ¿Qué tareas externas rompen hoy el contexto y cuáles pueden permanecer como
   integraciones?
 - ¿Qué materiales deben seguir teniendo respaldo imprimible?
+- ¿En qué tareas abrir documentos fuera de Praxis rompe el contexto y cuándo un
+  visor integrado aporta más valor que una pestaña externa o descarga?
 - ¿Qué reducción de coordinación y papel justifica el costo de cada módulo?
 
 ## Referencias relacionadas

@@ -21,6 +21,12 @@ Google Drive
 La primera versión está dirigida a coordinadores. No es un sistema de autoría,
 un editor de documentos ni una sincronización continua con Google Docs.
 
+El importador es una línea de producto centrada en integridad editorial. No
+sustituye la validación operacional del flujo de eventos ni representa por sí
+solo el roadmap completo de Praxis. Su avance debe convivir con pilotos
+pequeños, corrección de defectos y medición de valor para los demás actores de
+la experiencia.
+
 ## 2. Ubicación en la aplicación
 
 El punto de entrada estará en:
