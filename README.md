@@ -144,6 +144,8 @@ prioriza `current`, mientras la nueva versión continúa su revisión en
 
 ## Documentación
 
+- [Visión de producto](docs/vision-producto-praxis.md): tesis estratégica,
+  frontera del producto, experiencia PMV, métricas y reducción de papel.
 - [Transferencia vigente](docs/transferencia-praxis.md): estado, defectos,
   siguiente alcance y checklist.
 - [Contrato Firestore del PMV](docs/firestore-pmv.md): rutas, campos, seed y
