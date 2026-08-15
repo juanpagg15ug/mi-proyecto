@@ -1,0 +1,184 @@
+{
+  "scope": "centro_recursos",
+  "schemaVersion": 2,
+  "resources": [
+    {
+      "id": "report",
+      "title": "Reporte de caso clínico académico",
+      "description": "Guía y plantilla oficial para preparar un reporte clínico académico.",
+      "type": "plantilla",
+      "audience": "Docentes y coordinadores",
+      "icon": "fa-file-medical",
+      "channels": {
+        "current": {
+          "version": "v1",
+          "editorialStatus": "aprobada",
+          "publicationStatus": "publicada",
+          "validations": {
+            "coordinacion": true,
+            "clinica": true,
+            "pedagogica": true,
+            "editorial": true
+          },
+          "files": [
+            {
+              "title": "Plantilla 1: Reporte de Caso Clínico Académico",
+              "description": "Documento Word oficial para redactar y revisar reportes académicos.",
+              "file": "./docs/oficiales/reporte-academico/current/plantilla-reporte-caso-clinico-academico-v1.docx",
+              "format": "docx"
+            }
+          ]
+        },
+        "working": null
+      },
+      "archive": [],
+      "package": [
+        "00_Metadata/metadata.json",
+        "01_Reporte/reporte.docx",
+        "02_Referencias/"
+      ]
+    },
+    {
+      "id": "simulation",
+      "title": "Guion de caso de simulación clínica",
+      "description": "Paquete de tres secciones para preparar lectura, escenario y facilitación.",
+      "type": "plantilla",
+      "audience": "Docentes, coordinadores, instructores y SimTech",
+      "icon": "fa-person-chalkboard",
+      "channels": {
+        "current": {
+          "version": "v1",
+          "editorialStatus": "aprobada",
+          "publicationStatus": "publicada",
+          "validations": {
+            "coordinacion": true,
+            "clinica": true,
+            "pedagogica": true,
+            "editorial": true
+          },
+          "files": [
+            {
+              "title": "01_Lectura: Viñeta y lectura pública",
+              "description": "Documento Word oficial para la información que verá el participante.",
+              "file": "./docs/oficiales/simulacion/current/01_Lectura%20-%20v1Plantilla%20de%20Viñeta%20y%20Lectura%20Pública.docx",
+              "format": "docx"
+            },
+            {
+              "title": "02_Escenario: Guion y script del instructor",
+              "description": "Documento Word oficial para escenario, acciones, respuestas y operación.",
+              "file": "./docs/oficiales/simulacion/current/02_Escenario%20-%20v1Plantilla%20de%20Guion%20y%20Script%20del%20Instructor.docx",
+              "format": "docx"
+            },
+            {
+              "title": "03_Debriefing: Facilitación y listas de cotejo",
+              "description": "Documento Word oficial para debriefing, preguntas y evaluación.",
+              "file": "./docs/oficiales/simulacion/current/03_Debriefing%20-%20v1Plantilla%20de%20Facilitación%20y%20Listas%20de%20Cotejo.docx",
+              "format": "docx"
+            }
+          ]
+        },
+        "working": null
+      },
+      "archive": [
+        {
+          "version": "legacy-v1",
+          "publicationStatus": "archivada",
+          "directory": "./docs/oficiales/simulacion/archive/v1/",
+          "description": "Plantilla histórica monolítica; no es fuente activa."
+        }
+      ],
+      "package": [
+        "00_Metadata/metadata.json",
+        "01_Lectura/lectura.docx",
+        "02_Escenario/escenario.docx",
+        "03_Debriefing/debriefing.docx"
+      ]
+    },
+    {
+      "id": "authors",
+      "title": "Guía para Autores",
+      "description": "Orientación inicial para redactar casos de Praxis/SIM-POCUS con apoyo de inteligencia artificial.",
+      "type": "guia",
+      "audience": "Docentes y coordinadores de Praxis/SIM-POCUS",
+      "icon": "fa-user-pen",
+      "channels": {
+        "current": null,
+        "working": {
+          "version": "v0.1-borrador",
+          "editorialStatus": "en_revision",
+          "publicationStatus": "no_publicada",
+          "validations": {
+            "coordinacion": false,
+            "clinica": false,
+            "pedagogica": false,
+            "editorial": false
+          },
+          "files": [
+            {
+              "title": "Guía para Autores v0.1",
+              "description": "Borrador visible para revisión de coordinación, clínica, pedagogía y edición.",
+              "file": "./docs/guias/autores/working/guia-autores-praxis-v0.1-borrador.pdf",
+              "format": "pdf"
+            }
+          ]
+        }
+      },
+      "archive": [],
+      "sectionDescription": "Consulta la versión de trabajo vigente. Puede cambiar durante la revisión.",
+      "notice": {
+        "label": "Estado editorial",
+        "title": "Pendiente de aprobación",
+        "description": "Este documento es material de trabajo y todavía no constituye la versión oficial.",
+        "items": [
+          "Revisión de coordinación.",
+          "Validación clínica y pedagógica.",
+          "Revisión editorial y aprobación final."
+        ]
+      },
+      "packageLabel": "Control de versiones",
+      "packageTitle": "Estructura de la guía",
+      "package": [
+        "current/ (publicación vigente; vacío)",
+        "working/guia-autores-praxis-v0.1-borrador.pdf",
+        "archive/",
+        "Registro: docs/centro-recursos/metadata.json"
+      ]
+    },
+    {
+      "id": "editorial",
+      "title": "Guía editorial de casos",
+      "description": "Normas oficiales de estilo, citación, inclusión, anonimización y revisión.",
+      "type": "guia",
+      "audience": "Autores, revisores y coordinadores",
+      "icon": "fa-pen-ruler",
+      "channels": {
+        "current": {
+          "version": "v1",
+          "editorialStatus": "aprobada",
+          "publicationStatus": "publicada",
+          "validations": {
+            "coordinacion": true,
+            "clinica": null,
+            "pedagogica": null,
+            "editorial": true
+          },
+          "files": [
+            {
+              "title": "Guía Editorial de Casos",
+              "description": "Documento Word oficial de referencia editorial.",
+              "file": "./docs/oficiales/editorial/current/guia-editorial-casos-v1.docx",
+              "format": "docx"
+            }
+          ]
+        },
+        "working": null
+      },
+      "archive": [],
+      "package": [
+        "Plantilla oficial",
+        "metadata.json cuando se prepare un caso",
+        "Paquete de entrega para revisión"
+      ]
+    }
+  ]
+}

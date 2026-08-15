@@ -115,10 +115,32 @@ validación clínica, pedagógica y editorial.
 public/                 aplicación estática publicada
 public/js/views/        vistas de catálogo, eventos, casos y recursos
 public/docs/oficiales/  plantillas Word disponibles para autores
+public/docs/guias/      guías versionadas y su estado editorial
+public/docs/centro-recursos/metadata.json  metadata del Centro de recursos
 docs/                   contratos, planes y transferencia
 firestore.rules         reglas vigentes del PMV
 firebase.json           Hosting, Firestore y emuladores
 ```
+
+Las guías versionadas usan `current/` para la versión publicada vigente,
+`working/` para la versión en desarrollo y `archive/<version>/` para versiones
+publicadas reemplazadas. En este contexto, `current/` significa exclusivamente
+la publicación vigente; nunca debe contener borradores. El archivo
+`public/docs/centro-recursos/metadata.json` es la fuente única de versión,
+estado, audiencia, validaciones y rutas únicamente para el Centro de recursos;
+no describe la aplicación, los casos ni Firestore. Un documento `en_revision`
+puede mostrarse para recibir comentarios, pero no debe etiquetarse como oficial
+hasta completar sus validaciones.
+
+La metadata registra por recurso los canales `channels.current` y
+`channels.working`. Ambos pueden existir al mismo tiempo: la interfaz pública
+prioriza `current`, mientras la nueva versión continúa su revisión en
+`working`. Para publicar una nueva versión:
+
+1. Mover la carpeta publicada `current/` completa a `archive/<version>/`.
+2. Mover el contenido aprobado de `working/` a `current/`.
+3. Actualizar ambos canales y el inventario `archive` en la metadata.
+4. Desplegar y comprobar las rutas antes de retirar redirecciones históricas.
 
 ## Documentación
 
@@ -134,6 +156,8 @@ firebase.json           Hosting, Firestore y emuladores
   dominio ligero, separación por capas y evaluación progresiva de React.
 - [Memoria editorial para IA](docs/ia-generacion-casos-praxis.md): generación y
   revisión de contenido con las plantillas oficiales.
+- [ADR 0006: versionado y ciclo editorial por scope](docs/decisiones/0006-versionado-y-ciclo-editorial-por-scope.md):
+  convención del Centro de recursos y criterios de benchmarking transversal.
 - [Decisiones arquitectónicas](docs/decisiones/): decisiones duraderas y sus
   consecuencias.
 

@@ -66,9 +66,10 @@ function renderCalculator() {
 }
 
 function renderResources() {
-    startView();
+    const token = startView();
     renderHeader(1);
     renderResourcesView('app-container', {
+        token,
         onBack: () => renderModuleSelector(),
         onOpenCalculator: () => renderCalculator(),
         onOpenKeyGenerator: () => renderCaseKeyGenerator()

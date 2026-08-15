@@ -10,6 +10,23 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source": "/docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx",
+        "destination": "/docs/oficiales/reporte-academico/current/plantilla-reporte-caso-clinico-academico-v1.docx",
+        "type": 301
+      },
+      {
+        "source": "/docs/oficiales/guia-editorial-casos.docx",
+        "destination": "/docs/oficiales/editorial/current/guia-editorial-casos-v1.docx",
+        "type": 301
+      },
+      {
+        "source": "/docs/guias/autores/current/guia-autores-praxis-v0.1-borrador.pdf",
+        "destination": "/docs/guias/autores/working/guia-autores-praxis-v0.1-borrador.pdf",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "**",

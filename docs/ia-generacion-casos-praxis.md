@@ -341,8 +341,8 @@ public/docs/oficiales/simulacion/current/
 Tambien puede usarse:
 
 ```text
-public/docs/oficiales/plantilla-1-reporte-caso-clinico-academico.docx
-public/docs/oficiales/guia-editorial-casos.docx
+public/docs/oficiales/reporte-academico/current/plantilla-reporte-caso-clinico-academico-v1.docx
+public/docs/oficiales/editorial/current/guia-editorial-casos-v1.docx
 ```
 
 El archivo historico de simulacion no es fuente activa:
