@@ -146,6 +146,8 @@ prioriza `current`, mientras la nueva versión continúa su revisión en
 
 - [Visión de producto](docs/vision-producto-praxis.md): tesis estratégica,
   frontera del producto, experiencia PMV, métricas y reducción de papel.
+- [Ciclo de vida del producto](docs/ciclo-vida-producto-praxis.md):
+  etapas, puertas de evidencia, capacidades, madurez y retiro.
 - [Transferencia vigente](docs/transferencia-praxis.md): estado, defectos,
   siguiente alcance y checklist.
 - [Contrato Firestore del PMV](docs/firestore-pmv.md): rutas, campos, seed y
@@ -158,6 +160,8 @@ prioriza `current`, mientras la nueva versión continúa su revisión en
   dominio ligero, separación por capas y evaluación progresiva de React.
 - [Plan futuro de orquestación e interoperabilidad](docs/plan-evolucion-orquestacion-interoperabilidad.md):
   frontera poseer/integrar/referenciar, modo autónomo y pilotos con proveedores externos.
+- [Mapa de decisiones arquitectónicas candidatas](docs/mapa-decisiones-arquitectonicas-candidatas.md):
+  temas extrapolables, evidencia requerida y criterios para promoverlos a ADR.
 - [Memoria editorial para IA](docs/ia-generacion-casos-praxis.md): generación y
   revisión de contenido con las plantillas oficiales.
 - [ADR 0006: versionado y ciclo editorial por scope](docs/decisiones/0006-versionado-y-ciclo-editorial-por-scope.md):

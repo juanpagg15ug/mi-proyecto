@@ -247,6 +247,7 @@ reales antes de convertirse en objetivos.
 
 ## Referencias relacionadas
 
+- [Ciclo de vida del producto](ciclo-vida-producto-praxis.md)
 - [Transferencia vigente](transferencia-praxis.md)
 - [ADR 0002: eventos referencian casos](decisiones/0002-eventos-referencian-casos.md)
 - [ADR 0005: experiencia, interfaz y accesibilidad](decisiones/0005-experiencia-interfaz-y-accesibilidad.md)

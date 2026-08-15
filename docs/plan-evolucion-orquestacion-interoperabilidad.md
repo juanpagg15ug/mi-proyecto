@@ -15,6 +15,11 @@ las decisiones vigentes. Odoo es un candidato de integración para SIM-POCUS,
 no una dependencia obligatoria ni una selección definitiva para toda
 institución.
 
+Algunos guardrails de este plan pueden extrapolarse a otros scopes. Se registran
+como candidatas en el
+[mapa de decisiones arquitectónicas](mapa-decisiones-arquitectonicas-candidatas.md),
+pero no son política global hasta que una ADR defina y acepte su alcance.
+
 ## 2. Tesis de arquitectura
 
 Praxis debe poseer la lógica que hace ejecutable una experiencia de simulación.
@@ -98,6 +103,9 @@ viva fuera:
 participantRef
   -> provider, externalId y snapshot operacional mínimo permitido
 
+institutionalAffiliation
+  -> relación institucional contextual solo cuando una política la requiera
+
 administrativeEventRef
   -> provider, externalId y datos necesarios para enlazar la experiencia
 
@@ -109,6 +117,12 @@ No deben copiarse por conveniencia datos patrimoniales, financieros, académicos
 o personales que Praxis no necesite para operar. Una referencia externa no
 garantiza disponibilidad ni autorización; esas condiciones deben comprobarse
 en el momento definido por el caso de uso.
+
+La afiliación institucional no equivale a una asignación operacional. Una
+persona puede ser asociada activa, numeraria, aspirante, empleada, invitada o no
+tener vínculo directo y, dentro de una experiencia, actuar como participante,
+facilitadora, instructora, actriz, SimTech u observadora. Praxis conserva solo
+la dimensión necesaria para aplicar una política explícita.
 
 Praxis sí conserva como información propia:
 
@@ -150,7 +164,10 @@ Contratos candidatos:
 
 ```text
 ParticipantProvider
-  -> resolveParticipant, listEventParticipants
+  -> resolvePerson, getInstitutionalAffiliations, listEventEnrollments
+
+ExperienceAssignmentService (dominio Praxis)
+  -> assignEventRole, assignStationRole, authorizeExperienceAccess
 
 AdministrativeEventProvider
   -> getEvent, listEvents
@@ -185,6 +202,22 @@ identidades, políticas y auditoría entre sistemas.
 
 Estos niveles deben validarse con instituciones reales. No constituyen todavía
 paquetes comerciales ni compromisos de funcionalidad.
+
+El modo de despliegue modifica la resolución de ownership y las políticas, pero
+no el significado del core:
+
+| Decisión | Standalone | Integrated | Ecosystem |
+| --- | --- | --- | --- |
+| Dato maestro administrativo | Proveedor local mínimo | Sistema institucional acordado | Owner explícito por entidad y organización |
+| Asignación operacional | Praxis | Praxis | Praxis, con referencias de uno o más proveedores |
+| Autorización | Política local de Praxis | Identidad federada más política Praxis | Federación y política contextual por institución |
+| Disponibilidad de recursos | Registro local simplificado | Consulta al inventario owner | Resolución entre inventarios y políticas de precedencia |
+| Operación degradada | Datos locales | Snapshot permitido y contingencia | Degradación por proveedor sin perder el core |
+
+Una misma institución puede utilizar modos distintos por capacidad. Por
+ejemplo, participantes integrados con Odoo y recursos gestionados localmente.
+El modo no debe inferirse globalmente ni obligar a migrar todas las entidades al
+mismo tiempo.
 
 ## 8. Principios de evolución
 
@@ -228,6 +261,10 @@ una fricción observable de la experiencia o preservar su continuidad.
 Los puertos no se diseñan a partir de las tablas o APIs de un proveedor. Se
 derivan de casos de uso de Praxis ya observados con datos locales.
 
+Un proveedor de identidad o participantes no concede roles operacionales. La
+traducción entre un dato institucional y una asignación en Praxis pertenece a
+una política explícita del dominio, no al adaptador.
+
 Antes de crear o ampliar un `Provider` se debe responder:
 
 1. qué decisión o acción de la experiencia necesita esos datos;
@@ -266,6 +303,183 @@ arquitectónicas y operativas:
 
 Una integración no se aprueba si elimina el modo autónomo sin una decisión
 arquitectónica posterior que justifique explícitamente el costo y el riesgo.
+
+### Reglas de gestión frente a reglas de operación
+
+Praxis no debe mezclar reglas administrativas de una organización con reglas
+que controlan la ejecución de una simulación. Ambas pueden afectar una misma
+experiencia, pero tienen owner, finalidad, vigencia y consecuencias distintas.
+
+```text
+Reglas de gestión institucional
+  -> afiliación, elegibilidad, inscripción, pago, agenda, jornada,
+     autorización administrativa, inventario y políticas organizacionales
+
+Reglas de operación de la simulación
+  -> release del caso, grupos, estación asignada, responsabilidad operacional,
+     tiempo, rotación, transición, criterios de inicio o parada,
+     contingencia y recuperación
+```
+
+El sistema institucional decide, por ejemplo, si una persona está inscrita o
+si un activo puede asignarse administrativamente. Praxis decide cómo participa
+esa persona en la experiencia, qué estación ejecuta, qué material recibe y qué
+debe ocurrir en cada transición.
+
+La integración no importa reglas de gestión como si fueran reglas de
+simulación. Traduce resultados explícitos entre contextos:
+
+```text
+inscripción válida en sistema institucional
+  -> candidato elegible para una asignación en Praxis
+
+recurso disponible en inventario
+  -> candidato para cubrir un requerimiento de estación
+
+asignación operacional aprobada en Praxis
+  -> acceso temporal al contexto de evento o estación
+```
+
+Ninguna traducción es automática por coincidencia de nombres, jerarquía o
+estado. Debe existir una política identificable, comprobable y auditable.
+
+Cuando las reglas entren en tensión se aplica esta precedencia:
+
+1. seguridad de las personas, parada del escenario y contingencia operacional;
+2. autorización efectiva y protección de información;
+3. integridad de la experiencia fijada y sus asignaciones activas;
+4. restricciones administrativas comunicadas antes de la ejecución;
+5. preferencias logísticas que puedan reprogramarse.
+
+Esta precedencia no permite que Praxis ignore una prohibición institucional ni
+que un ERP cambie silenciosamente una simulación en curso. Los conflictos deben
+producir un estado visible, una decisión humana cuando corresponda y un registro
+de qué regla prevaleció y por qué.
+
+Las reglas clínicas y pedagógicas del contenido tampoco deben confundirse con
+reglas administrativas u operacionales. Definen validez del caso, objetivos y
+criterios de desempeño; su modificación sigue el ciclo editorial y no ocurre
+como efecto lateral de una integración.
+
+### Restricciones y disponibilidad de recursos
+
+La Teoría de Restricciones puede orientar la preparación y ejecución: Praxis
+debe identificar qué limitación determina la capacidad real de la experiencia,
+proteger ese recurso crítico y evitar optimizar componentes que no aumentan el
+flujo global.
+
+La información administrativa de inventario, agenda o personal es una entrada
+de factibilidad, no la autoridad sobre el diseño pedagógico ni sobre el core de
+Praxis. Un proveedor puede informar que un recurso está disponible, reservado,
+fuera de servicio o en ubicación distinta. Praxis decide qué impacto tiene ese
+estado sobre una estación y qué alternativas son válidas para la experiencia.
+
+Las restricciones se clasifican antes de aplicar una decisión:
+
+```text
+Restricción dura
+  -> seguridad, autorización, requisito clínico o recurso sin sustituto;
+     bloquea iniciar o continuar en la configuración afectada
+
+Restricción de capacidad
+  -> cantidad de equipos, espacios, facilitadores o tiempo;
+     limita concurrencia, grupos o ritmo de rotación
+
+Restricción blanda
+  -> preferencia logística o recurso sustituible;
+     permite alternativa aprobada sin cambiar el objetivo
+
+Restricción incierta
+  -> dato ausente, desactualizado o proveedor no disponible;
+     exige verificación, contingencia o decisión humana
+```
+
+Praxis no debe declarar disponible un recurso que el sistema responsable marca
+como no utilizable. Tampoco debe cancelar, degradar o rediseñar silenciosamente
+una experiencia por un cambio administrativo. Debe mostrar la restricción, el
+cuello de botella y su alcance, y ofrecer únicamente respuestas previamente
+permitidas:
+
+```text
+mantener configuración y resolver el recurso
+reducir concurrencia o ajustar la rotación
+usar sustituto pedagógica y técnicamente aprobado
+reprogramar la estación
+bloquear y escalar para decisión humana
+```
+
+El ciclo operacional inspirado en Teoría de Restricciones es:
+
+1. identificar la restricción que limita la experiencia;
+2. decidir cómo aprovecharla sin comprometer seguridad ni objetivos;
+3. subordinar grupos, secuencia y recursos no críticos a esa decisión;
+4. ampliar capacidad o sustituir el recurso cuando esté aprobado;
+5. volver a evaluar, porque el cuello de botella puede trasladarse.
+
+La optimización administrativa busca utilización de activos, costos o agenda.
+La optimización de Praxis busca continuidad, seguridad y logro de la
+experiencia. Ninguna métrica administrativa debe prevalecer automáticamente
+sobre esas prioridades.
+
+### Estrategia de transición y sistemas legacy
+
+Adoptar interoperabilidad exige decidir qué ocurre con cada sistema y conjunto
+de datos existente. `Integrar` no significa mantener dos sistemas activos para
+siempre ni copiar todos los registros a Praxis.
+
+Cada capacidad debe elegir explícitamente una estrategia:
+
+```text
+Convivencia federada
+  -> cada sistema conserva su responsabilidad y se intercambian referencias
+
+Migración
+  -> datos y responsabilidad pasan a un nuevo owner con corte y validación
+
+Fusión o consolidación
+  -> varios modelos se unifican bajo un contrato canónico y se eliminan
+     duplicados con reglas de resolución
+
+Sustitución progresiva
+  -> el sistema nuevo asume casos de uso por etapas mientras el anterior reduce
+     su alcance
+
+Archivo o legacy de consulta
+  -> el sistema anterior deja de operar y permanece accesible solo por
+     trazabilidad, retención o requisitos legales
+
+Retiro
+  -> datos permitidos se eliminan y se apagan integraciones e infraestructura
+```
+
+La estrategia se decide por capacidad, no para toda la plataforma de una sola
+vez. Personas pueden permanecer federadas, mientras una planificación local de
+eventos se migra y un inventario histórico queda como legacy de consulta.
+
+No se recomienda fusionar bases de datos completas. La consolidación debe
+partir de ownership, identidad canónica, semántica de campos, calidad, retención
+y consumidores. Un identificador coincidente no demuestra que dos registros
+representen la misma entidad.
+
+Durante una convivencia temporal deben definirse:
+
+- sistema de registro y sistema consumidor por entidad;
+- dirección de sincronización y campos autorizados;
+- reglas de resolución de conflictos;
+- identificadores y tabla de correspondencias;
+- momento de corte y criterio para dejar de escribir en el sistema anterior;
+- reconciliación, auditoría, rollback y contingencia;
+- retención, acceso y fecha de retiro del legacy;
+- responsable operativo y costo de mantener cada sistema.
+
+Una integración temporal sin fecha, owner o condición de salida se considera
+deuda arquitectónica. El plan debe evitar que Praxis se convierta en un segundo
+sistema de registro accidental y que una sincronización transitoria se vuelva
+permanente por omisión.
+
+Antes de migrar o consolidar se requiere inventario de consumidores y una
+prueba de reversión. Ningún corte debe realizarse durante una simulación activa
+ni cambiar referencias fijadas por una experiencia preparada.
 
 ### Criterios de detención
 
@@ -337,6 +551,8 @@ se publique una nueva, y puede reconstruirse qué release utilizó.
 Trabajo:
 
 - requerimientos tipados de recursos por estación;
+- clasificación de restricciones duras, de capacidad, blandas e inciertas;
+- detección del cuello de botella de la experiencia y alternativas aprobadas;
 - grupos, secuencia y matriz de rotación;
 - tiempos y reglas de transición;
 - estado de preparación y ejecución;
@@ -356,8 +572,14 @@ Trabajo:
 - implementar proveedores locales para participantes, evento administrativo y
   recursos;
 - usar referencias estables y snapshots mínimos;
+- representar afiliación institucional y asignación operacional como
+  dimensiones independientes;
+- probar participantes internos, invitados externos y personas sin afiliación
+  institucional directa;
 - simular indisponibilidad y recuperación del proveedor;
 - probar sustitución de adaptadores sin cambiar reglas del dominio.
+- documentar qué datos locales son permanentes en Standalone y cuáles son
+  candidatos a federación, migración o retiro al activar una integración.
 
 **Puerta de salida:** la experiencia funciona en modo autónomo y el dominio no
 conoce estructuras específicas de Firebase u Odoo.
@@ -371,7 +593,13 @@ Alcance inicial:
 
 - seleccionar un evento administrativo de Odoo;
 - resolver participantes inscritos mediante referencias;
+- conservar las categorías institucionales como contexto, sin convertirlas
+  automáticamente en roles o privilegios de Praxis;
+- crear las asignaciones de evento y estación mediante reglas operacionales de
+  Praxis;
 - consultar recursos y disponibilidad para los requerimientos de estaciones;
+- transformar disponibilidad administrativa en restricciones visibles, sin
+  alterar automáticamente la configuración operacional;
 - mostrar procedencia, momento de consulta y estado de sincronización;
 - conservar una alternativa local o una degradación explícita.
 
@@ -419,6 +647,7 @@ Trabajo posible:
 - segundo adaptador real para probar que los puertos no reflejan solo Odoo;
 - resolución de referencias entre proveedores;
 - políticas por institución y selección de adaptador;
+- estrategia de convivencia, migración o retiro por capacidad y proveedor;
 - observabilidad de sincronización y salud de conectores;
 - contratos versionados y compatibilidad de capacidades.
 
@@ -432,6 +661,43 @@ la experiencia ni degradar el modo standalone.
 El ADR 0004 sigue siendo la dirección. Una identidad externa no concede por sí
 misma acceso a Praxis. Las asignaciones de experiencia y los permisos deben
 resolverse y auditarse en el alcance correspondiente.
+
+La interoperabilidad separa cuatro dimensiones:
+
+```text
+Identidad
+  -> quién es la persona y qué sistema la referencia
+
+Afiliación institucional
+  -> relación con una asociación u organización
+
+Privilegios administrativos
+  -> acciones permitidas en el sistema institucional
+
+Asignación operacional
+  -> responsabilidad temporal dentro de una experiencia o estación
+```
+
+No se usa un campo universal `role` para mezclar estas dimensiones. Una
+jerarquía institucional no concede automáticamente acceso a coordinación,
+instrucción, debriefing o administración en Praxis. Del mismo modo, una persona
+externa puede recibir una asignación operacional válida cuando la política de
+la experiencia lo permita.
+
+La autorización efectiva combina identidad válida, asignación contextual y
+política del recurso. Una afiliación puede intervenir en elegibilidad,
+inscripción o condiciones administrativas solo cuando exista una regla
+documentada; no se hereda como privilegio operacional implícito.
+
+Las asignaciones deben indicar alcance y vigencia, por ejemplo evento,
+estación, responsabilidad, inicio y expiración. Cuando Praxis conserve una
+afiliación externa como snapshot, debe registrar procedencia y momento de
+consulta para no presentarla como dato institucional actualizado.
+
+La autorización responde a políticas; la ejecución responde además a reglas
+operacionales. Una persona puede estar autorizada para participar y todavía no
+tener grupo o estación asignados. Del mismo modo, una asignación operacional no
+subsana una inscripción inválida cuando la institución exige esa condición.
 
 ### Custodia y publicación
 
@@ -476,6 +742,25 @@ No se inicia el adaptador hasta resolver:
 8. qué instancia de prueba y datos anonimizados estarán disponibles;
 9. quién opera, monitorea y revoca la integración;
 10. qué métrica justificaría pasar de consulta a escritura.
+11. qué categorías de afiliación existen y para qué políticas son relevantes;
+12. qué reglas convierten una inscripción en asignación operacional, sin
+  heredar jerarquías o privilegios institucionales;
+13. qué sistema decide elegibilidad, asignación, autorización y revocación en
+  cada etapa.
+14. qué reglas son de gestión institucional y cuáles pertenecen a la operación
+  de la simulación;
+15. cómo se traducen sus resultados y qué precedencia se aplica ante un
+  conflicto durante preparación o ejecución.
+16. qué recursos constituyen restricciones duras, cuáles admiten sustitución y
+  quién aprueba las alternativas;
+17. qué antigüedad del dato de disponibilidad es aceptable y cuándo debe
+  verificarse nuevamente antes de ejecutar.
+18. si cada capacidad convivirá, migrará, se consolidará, se sustituirá o se
+  retirará;
+19. cuál es el sistema de registro durante la transición y qué condición cierra
+  la sincronización temporal;
+20. qué datos legacy deben conservarse, por cuánto tiempo y con qué acceso;
+21. cómo se revierte el corte sin afectar una experiencia preparada o activa.
 
 Estas respuestas deben producir un ADR de integración específico. Este plan no
 selecciona todavía endpoints, SDK, middleware ni topología de despliegue.
@@ -490,10 +775,12 @@ Comparar modo actual, standalone evolucionado e integrado:
 | Duplicación | Datos introducidos en más de un sistema |
 | Versiones | Incidentes o dudas sobre el release usado |
 | Recursos | Requerimientos sin asignación o disponibilidad confirmada |
+| Restricciones | Cuellos de botella detectados antes del evento y tiempo de resolución |
 | Ejecución | Intervenciones manuales y tiempo perdido por estación |
 | Recuperación | Tiempo para continuar después de una incidencia |
 | Papel | Páginas, paquetes y reimpresiones por evento |
 | Integración | Latencia, errores, reintentos y antigüedad de datos |
+| Transición | Registros conciliados, conflictos, duplicados y tiempo hasta retirar el legacy |
 | Trazabilidad | Experiencias cuyo contexto puede reconstruirse |
 | Adopción | Tareas realizadas en el flujo previsto frente a canales paralelos |
 
@@ -511,6 +798,17 @@ autónoma.
 | Duplicar personas o activos | Referencias externas y snapshots mínimos con retención |
 | Integrar antes de probar el core | Completar fases de releases y operación primero |
 | Eventos inconsistentes entre sistemas | Definir owner y distinguir evento administrativo de experiencia |
+| Convertir jerarquía institucional en permisos operacionales | Separar afiliación, privilegios administrativos y asignaciones contextuales |
+| Excluir participantes externos por falta de afiliación | Autorizar mediante asignación de experiencia y política explícita |
+| Usar `role` con significados incompatibles | Nombres y contratos delimitados por contexto, alcance y vigencia |
+| Mezclar reglas administrativas y operacionales | Owners separados, traducciones explícitas y precedencia documentada |
+| Cambiar una simulación activa por una actualización institucional | Fijar contexto operacional y exigir conciliación visible |
+| Optimizar utilización administrativa a costa de la experiencia | Priorizar seguridad, continuidad y objetivos; registrar la restricción |
+| Tratar disponibilidad como decisión pedagógica | Clasificar impacto y usar solo alternativas aprobadas por Praxis |
+| Mantener dos sistemas de registro indefinidamente | Owner temporal, fecha o condición de salida y plan de corte |
+| Crear un legacy nuevo durante la integración | Estrategia por capacidad, presupuesto de retiro y observabilidad de consumidores |
+| Fusionar registros con semántica distinta | Identidad canónica, reglas de correspondencia y conciliación previa |
+| Romper experiencias durante una migración | Releases y referencias fijadas, ventana de corte y rollback probado |
 | Exponer borradores o contenido sensible | IAM, reglas, publicación explícita y releases inmutables |
 | Fallos parciales en escrituras | Lectura primero; luego idempotencia, auditoría y compensación |
 | Scope comercial prematuro | Validar Standalone/Integrated/Ecosystem con evidencia |
@@ -549,6 +847,7 @@ Cada fase debe cerrar con evidencia y una decisión explícita:
 
 ## 17. Referencias
 
+- [Mapa de decisiones arquitectónicas candidatas](mapa-decisiones-arquitectonicas-candidatas.md)
 - [Visión de producto](vision-producto-praxis.md)
 - [Transferencia vigente](transferencia-praxis.md)
 - [Plan del importador editorial](importador-praxis.md)
