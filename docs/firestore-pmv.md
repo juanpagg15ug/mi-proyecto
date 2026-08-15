@@ -17,6 +17,58 @@ La misma dependencia debe revisarse para el proyecto Firebase `praxis-prio`: con
 
 La primera carpeta funciona como raíz organizativa; la segunda es la fuente de las plantillas editoriales usadas para preparar los casos y guiones del PMV. Estos enlaces son referencias de origen, no una integración automática con Google Drive.
 
+### Separacion de cuentas para el importador
+
+La cuenta propietaria de estas carpetas no tiene que coincidir con la cuenta
+del coordinador que opere el importador ni con la cuenta de la persona que
+mantiene el programa. El acceso se concede por permisos de Drive y no por una
+igualdad de correos entre sistemas.
+
+En la primera fase, la autenticacion real se limita al flujo de importacion y
+publicacion. Dentro de ese flujo se validan por separado:
+
+- la identidad de Praxis, que autoriza la escritura en Firestore;
+- la identidad de Google del operador, que autoriza Picker y las operaciones
+  permitidas sobre los archivos seleccionados o compartidos.
+
+No se debe usar la identidad del responsable tecnico como sustituto automatico
+del propietario de Drive o del operador. Tampoco se deben almacenar tokens de
+Google en Firestore ni dentro de `metadata.json`.
+
+### Custodia del contenido importado
+
+Dar acceso a un archivo no cambia su alojamiento ni su propiedad. En particular,
+una copia creada por el operador dentro de una carpeta compartida de `Mi unidad`
+puede seguir siendo propiedad del operador y consumir su almacenamiento. La
+ubicacion visible en una carpeta no demuestra custodia institucional.
+
+Para cada seccion importada deben distinguirse dos referencias:
+
+```text
+origen seleccionado
+  -> archivo temporal elegido con Picker; puede pertenecer al operador o a un tercero.
+
+copia canonica
+  -> archivo que queda bajo custodia de la cuenta o Unidad compartida de Praxis.
+```
+
+Firestore debe conservar como `fuente_google_doc_id` y
+`fuente_google_doc_url` la copia canonica. El origen puede aparecer solo en un
+registro privado de auditoria si se necesita trazabilidad y no debe exponerse
+en el documento publico del caso.
+
+La publicacion debe bloquearse si no se verifica que las tres copias canonicas
+estan en la ruta esperada y bajo la propiedad definida para el alojamiento. En
+la etapa transitoria de `Mi unidad`, las copias deben crearse con autorizacion
+de la cuenta de alojamiento o transferirse a ella de forma comprobable. A futuro
+se prefiere una Unidad compartida institucional, donde los archivos pertenecen
+a la organizacion y no a la persona que ejecuto la importacion.
+
+Esta copia de ingreso desde una fuente externa no contradice la regla de evitar
+duplicados al transferir posteriormente la carpeta maestra a una cuenta
+institucional: una vez creada la copia canonica, esa copia debe conservar su ID
+y no recrearse durante una migracion de propiedad.
+
 ### Mitigación inmediata
 
 - Mantener una única carpeta raíz para los documentos maestros, claramente separada de otros archivos personales.
